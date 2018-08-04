@@ -59,8 +59,14 @@ namespace fengin::systems::FysicsSystems {
     }
 
     void Collision::run(float) {
+        switch (state) {
+            case State::Init:
+                state = State::Run;
+                __init();
+                return;
+            case State::Run: return detectCollisions();
+        }
         //static float time = 0.0;
         //time += elapsed;
-        detectCollisions();
     }
 }
