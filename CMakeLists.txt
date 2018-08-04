@@ -7,6 +7,8 @@ execute_process(
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/release)
+
 SET(INCLUDED_DIRECTORIES include modules src)
 include_directories(${INCLUDED_DIRECTORIES})
 add_subdirectory(src/Systems/Log)
