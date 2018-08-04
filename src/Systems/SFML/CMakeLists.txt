@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.9)
+project(SFML VERSION 1.0 DESCRIPTION "SFML system for fender")
+set(CMAKE_CXX_STANDARD 17)
+
+FILE (GLOB ENTITIES ../../Entities/*.hpp)
+FILE (GLOB COMPONENTS ../../Components/*.hpp)
+FILE (GLOB SOURCES ./*.cpp ./*.hpp ./Camera/*.cpp ./Camera/*.hpp ${ENTITIES} ${COMPONENTS})
+add_library(SFML SHARED ${SOURCES})
+target_link_libraries(SFML -lstdc++fs)
+set_target_properties(SFML PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(SFML PROPERTIES PUBLIC_HEADER SFML.hpp)
