@@ -9,9 +9,9 @@
 
 namespace fengin::components {
     struct Transform : futils::IComponent {
-        vec2f size;
-        Position position;
-        float rotation;
+        vec3f size;
+        vec3f position;
+        vec3f rotation;
     };
 }
 

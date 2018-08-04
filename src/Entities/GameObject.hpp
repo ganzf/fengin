@@ -50,7 +50,7 @@ namespace fengin::entities {
             transform.size.h = size.h;
         }
 
-        futils::Vec2<float> const &getSize() const {
+        vec3f const &getSize() const {
             auto &transform = get<components::Transform>();
             return (transform.size);
         }
@@ -85,7 +85,7 @@ namespace fengin::entities {
             transform.position.z = z;
         }
 
-        Position const &getPosition() const {
+        vec3f const &getPosition() const {
             auto &transform = get<components::Transform>();
             return (transform.position);
         }
