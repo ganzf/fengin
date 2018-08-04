@@ -19,14 +19,18 @@ namespace fengin::systems::SFMLSystems {
         };
         int state{Init};
 
+        std::unordered_map<std::string, fengin::components::Camera *> knownCameras;
+        std::unordered_map<futils::IEntity *, sf::RenderWindow *> camToWindow;
+        std::unordered_multimap<int, futils::IEntity *> layout;
+
+        void renderWindow(futils::IEntity &cam);
+        void drawCamCrosshair(components::Camera &, sf::RenderWindow *);
+        void sortGameObjects();
+        void renderCam(futils::IEntity &, components::Camera &, components::World &);
+        void renderEachCam();
+        void init();
     public:
         IsoCam() : System("IsoCam") {}
-        virtual void run(float) override {
-            switch (state) {
-                case States::Init:
-                    state += 1;
-                    return __init();
-            }
-        };
+        virtual void run(float) override;
     };
 }

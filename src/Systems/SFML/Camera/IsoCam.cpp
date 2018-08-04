@@ -2,8 +2,10 @@
 // Created by arroganz on 8/3/18.
 //
 
+#include <Systems/SFML/Window.hpp>
 #include "IsoCam.hpp"
 #include "Entities/Camera.hpp"
+#include "Camera.hpp"
 
 namespace fengin::systems::SFMLSystems {
     void IsoCam::init()
@@ -94,27 +96,49 @@ namespace fengin::systems::SFMLSystems {
             auto range = layout.equal_range(currentLayer);
             for (auto it = range.first; it != range.second; it++)
             {
+//                auto &obj = it->second->get<components::GameObject>();
+//                if (!obj.visible)
+//                    continue ;
+
                 auto &obj = it->second->get<components::GameObject>();
                 if (!obj.visible)
                     continue ;
-                auto &absolute = it->second->get<components::AbsoluteTransform>();
                 auto &transform = it->second->get<components::Transform>();
+                sf::CircleShape point(3);
+                point.setFillColor(sf::Color::Blue);
+                point.setOutlineThickness(1);
+                point.setOutlineColor(sf::Color::White);
                 auto windowSize = realWindow->getSize();
-                auto unit = world.unit;
-                auto zoom = 1; // TODO : add zoom
-
-                absolute.position.x = (int)(windowSize.x / 2 + (transform.position.x - camPos.position.x) * unit * zoom);
-                absolute.position.y = (int)(windowSize.y / 2 + (transform.position.y - camPos.position.y) * unit * zoom);
-                absolute.size.x = (int)(transform.size.x * unit * zoom);
-                absolute.size.y = (int)(transform.size.y * unit * zoom);
-
-                if (absolute.position.x < (int) windowSize.x
-                    && absolute.position.x + absolute.size.x > 0
-                    && absolute.position.y < (int)windowSize.y
-                    && absolute.size.y + absolute.position.y > 0) {
-
-                    event.objects.push_back(it->second);
-                }
+                point.setPosition(transform.position.x - transform.position.y + windowSize.x / 2,
+                                  ((transform.position.x + transform.position.y) / 2) + windowSize.y / 2);
+                realWindow->draw(point);
+                point.setPosition(transform.position.x + transform.size.x - transform.position.y + windowSize.x / 2,
+                                  ((transform.position.x + transform.size.x + transform.position.y) / 2) + windowSize.y / 2);
+                realWindow->draw(point);
+                point.setPosition(transform.position.x - transform.size.x - transform.position.y + windowSize.x / 2,
+                                  ((transform.position.x - transform.size.x + transform.position.y) / 2) + windowSize.y / 2);
+                realWindow->draw(point);
+                point.setPosition(transform.position.x + transform.size.z - transform.position.y + windowSize.x / 2,
+                                  ((transform.position.x + transform.size.z + transform.position.y) / 2) + windowSize.y / 2);
+                realWindow->draw(point);
+//                auto &absolute = it->second->get<components::AbsoluteTransform>();
+//                auto &transform = it->second->get<components::Transform>();
+//                auto windowSize = realWindow->getSize();
+//                auto unit = world.unit;
+//                auto zoom = 1; // TODO : add zoom
+//
+//                absolute.position.x = (int)(windowSize.x / 2 + (transform.position.x - camPos.position.x) * unit * zoom);
+//                absolute.position.y = (int)(windowSize.y / 2 + (transform.position.y - camPos.position.y) * unit * zoom);
+//                absolute.size.x = (int)(transform.size.x * unit * zoom);
+//                absolute.size.y = (int)(transform.size.y * unit * zoom);
+//
+//                if (absolute.position.x < (int) windowSize.x
+//                    && absolute.position.x + absolute.size.x > 0
+//                    && absolute.position.y < (int)windowSize.y
+//                    && absolute.size.y + absolute.position.y > 0) {
+//
+//                    event.objects.push_back(it->second);
+//                }
 
             }
             event.window = realWindow;
