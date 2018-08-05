@@ -90,17 +90,17 @@ namespace fengin::entities {
             return (transform.position);
         }
 
-        int getPositionX() const {
+        float getPositionX() const {
             auto &transform = get<components::Transform>();
             return (transform.position.x);
         }
 
-        int getPositionY() const {
+        float getPositionY() const {
             auto &transform = get<components::Transform>();
             return (transform.position.y);
         }
 
-        int getPositionZ() const {
+        float getPositionZ() const {
             auto &transform = get<components::Transform>();
             return (transform.position.z);
         }

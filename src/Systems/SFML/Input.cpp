@@ -141,8 +141,9 @@ namespace fengin::systems::SFMLSystems
     void Input::process(sf::Event const &event)
     {
         // Deprecated "simple keys" event.
-        /*if (event.type == sf::Event::KeyPressed)
-            events->send<futils::Keys>(sfToFutilsKeys[event.key.code]);*/
+        if (event.type == sf::Event::KeyPressed) {
+            events->send<futils::Keys>(sfToFutilsKeys[event.key.code]);
+        }
 
         // If event.type is not handled, return
         // TODO: Place in container for readability
@@ -240,7 +241,7 @@ namespace fengin::systems::SFMLSystems
 
         // frameInputs[futils::InputAction(key, state)] = true;
 
-        // Now for each know input, we'll check the sequences to call functions.
+        // Now for each known input, we'll check the sequences to call functions.
         for (auto &input: entityManager->get<fengin::components::Input>())
         {
             if (input->activated)

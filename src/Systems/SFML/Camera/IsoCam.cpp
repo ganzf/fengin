@@ -86,8 +86,8 @@ namespace fengin::systems::SFMLSystems {
             return ;
         }
         auto &camPos = entity.get<components::Transform>();
-        int currentLayer = camPos.position.z - cam.viewDistance;
-        while (currentLayer < camPos.position.z)
+        int currentLayer = -200;
+        while (currentLayer < camPos.position.z + 200)
         {
             RenderLayer event;
             event.layer = currentLayer;
@@ -104,23 +104,99 @@ namespace fengin::systems::SFMLSystems {
                 if (!obj.visible)
                     continue ;
                 auto &transform = it->second->get<components::Transform>();
-                sf::CircleShape point(3);
-                point.setFillColor(sf::Color::Blue);
-                point.setOutlineThickness(1);
-                point.setOutlineColor(sf::Color::White);
+                float zoom = 50;
                 auto windowSize = realWindow->getSize();
-                point.setPosition(transform.position.x - transform.position.y + windowSize.x / 2,
-                                  ((transform.position.x + transform.position.y) / 2) + windowSize.y / 2);
-                realWindow->draw(point);
-                point.setPosition(transform.position.x + transform.size.x - transform.position.y + windowSize.x / 2,
-                                  ((transform.position.x + transform.size.x + transform.position.y) / 2) + windowSize.y / 2);
-                realWindow->draw(point);
-                point.setPosition(transform.position.x - transform.size.x - transform.position.y + windowSize.x / 2,
-                                  ((transform.position.x - transform.size.x + transform.position.y) / 2) + windowSize.y / 2);
-                realWindow->draw(point);
-                point.setPosition(transform.position.x + transform.size.z - transform.position.y + windowSize.x / 2,
-                                  ((transform.position.x + transform.size.z + transform.position.y) / 2) + windowSize.y / 2);
-                realWindow->draw(point);
+                auto worldToScreen = [zoom, camPos, windowSize](vec3f world){
+                    vec2f screen;
+                    world.x *= zoom;
+                    world.y *= zoom;
+                    world.z *= zoom;
+                    screen.x = world.x - world.y + camPos.position.x + windowSize.x / 2;
+                    screen.y = (world.x + world.y) / 2 + camPos.position.y / 2 + windowSize.y / 2;
+                    screen.y -= world.z;
+                    return screen;
+                };
+                auto getBoundingBox = [](const components::Transform &tr){
+                    std::vector<fengin::vec3f> points;
+                    // TopSquare - 0
+                    fengin::vec3f v = tr.position;
+                    points.push_back(tr.position);
+                    // TopAngle - 1
+                    v.x = tr.position.x - tr.size.x;
+                    v.y = tr.position.y - tr.size.y;
+                    points.emplace_back(v);
+
+                    // RightAngle - 2
+                    v.x = tr.position.x;
+                    v.y = tr.position.y - tr.size.y;
+                    points.emplace_back(v);
+
+                    // RightFace - 3
+                    v.x = tr.position.x;
+                    v.y = tr.position.y - tr.size.y;
+                    v.z = tr.position.z - tr.size.z;
+                    points.emplace_back(v);
+
+                    // LeftFace
+                    // BottomRight - 4
+                    v.x = tr.position.x;
+                    v.y = tr.position.y;
+                    v.z = tr.position.z - tr.size.z;
+                    points.emplace_back(v);
+                    // BottomLeft - 5
+                    v.x = tr.position.x - tr.size.x;
+                    v.z = tr.position.z - tr.size.z;
+                    points.emplace_back(v);
+
+                    // LeftAngle - 6
+                    v.x = tr.position.x - tr.size.x;
+                    v.y = tr.position.y;
+                    v.z = tr.position.z;
+                    points.emplace_back(v);
+                    return points;
+                };
+//                events->send<std::string>("IsoCam drawing : ");
+//                events->send<fengin::components::Transform>(transform);
+                auto drawPoint = [this, zoom, camPos, realWindow, worldToScreen, transform, windowSize](float deltaX, float deltaY, float deltaZ, sf::Color c) {
+                    sf::CircleShape point(2);
+                    point.setFillColor(sf::Color::Blue);
+                    point.setOutlineThickness(1);
+                    point.setOutlineColor(sf::Color::White);
+                    vec3f world;
+                    world.x = deltaX;
+                    world.y = deltaY;
+                    world.z = deltaZ;
+                    auto screen = worldToScreen(world);
+                    point.setPosition(screen.x, screen.y);
+                    point.setFillColor(c);
+                    realWindow->draw(point);
+                };
+
+                auto drawLine = [this, realWindow, worldToScreen](fengin::vec3f p1, fengin::vec3f p2, sf::Color c){
+                    auto a = worldToScreen(p1);
+                    auto b = worldToScreen(p2);
+                    sf::Vertex line[] = {
+                            sf::Vertex(sf::Vector2f(a.x, a.y), c),
+                            sf::Vertex(sf::Vector2f(b.x, b.y), c),
+                    };
+                    realWindow->draw(line, 2, sf::Lines);
+                };
+                const auto box = getBoundingBox(transform);
+                for (auto const &p: box) {
+                    drawPoint(p.x, p.y, p.z, sf::Color::White);
+                }
+
+                drawLine(box[0], box[6], sf::Color::Green);
+                drawLine(box[6], box[1], sf::Color::Green);
+                drawLine(box[1], box[2], sf::Color::Green);
+                drawLine(box[0], box[2], sf::Color::Green);
+                drawLine(box[3], box[2], sf::Color::Blue);
+                drawLine(box[3], box[4], sf::Color::Blue);
+                drawLine(box[4], box[5], sf::Color::Blue);
+                drawLine(box[5], box[6], sf::Color::Blue);
+                drawLine(box[0], box[4], sf::Color::Blue);
+
+
 //                auto &absolute = it->second->get<components::AbsoluteTransform>();
 //                auto &transform = it->second->get<components::Transform>();
 //                auto windowSize = realWindow->getSize();
@@ -173,13 +249,19 @@ namespace fengin::systems::SFMLSystems {
     void IsoCam::sortGameObjects() {
         layout.clear();
         auto gameObjects = entityManager->get<components::GameObject>();
+        auto nearness = [](components::Transform const &tr){
+            return (int)(tr.position.x + tr.position.y + tr.position.z);
+        };
+//        auto aCloserThanB = [nearness](components::Transform const &a, components::Transform const &b) {
+//            return nearness(a) > nearness(b);
+//        };
         for (auto &go: gameObjects)
         {
             auto &entity = go->getEntity();
             if (!entity.has<components::Transform>())
                 throw std::logic_error("Game object missing transform component in [Camera].");
             auto &transform = entity.get<components::Transform>();
-            layout.insert(std::pair<int, futils::IEntity *>(transform.position.z, &entity));
+            layout.insert(std::pair<int, futils::IEntity *>(nearness(transform), &entity));
         }
     }
 
