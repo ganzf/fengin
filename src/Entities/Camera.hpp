@@ -13,6 +13,8 @@ namespace fengin::entities {
     class Camera : public GameObject {
     public:
         Camera() {
+            auto &go = get<components::GameObject>();
+            go.visible = false;
             auto &transform = get<components::Transform>();
             transform.position.z = 10;
             attach<components::Camera>();
@@ -21,12 +23,15 @@ namespace fengin::entities {
         }
 
         Camera(fengin::entities::Window *win, std::string const &name = "Default") {
+            auto &go = get<components::GameObject>();
+            go.visible = false;
             auto &transform = get<components::Transform>();
             transform.position.z = 10;
             auto &cam = attach<components::Camera>();
             attach<components::Children>();
             cam.window = win;
             cam.name = name;
+            attach<components::rigidBody>();
         }
 
         ~Camera() {

@@ -112,7 +112,6 @@ namespace fengin::systems::SFMLSystems {
                     && absolute.position.x + absolute.size.x > 0
                     && absolute.position.y < (int)windowSize.y
                     && absolute.size.y + absolute.position.y > 0) {
-
                     event.objects.push_back(it->second);
                 }
 

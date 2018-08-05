@@ -8,6 +8,8 @@
 #include "Entities/Camera.hpp"
 #include "Camera.hpp"
 
+# define ABS(x) (x > 0 ? x : -x)
+
 namespace fengin::systems::SFMLSystems {
     void IsoCam::init()
     {
@@ -31,6 +33,7 @@ namespace fengin::systems::SFMLSystems {
             auto *cam = static_cast<fengin::entities::Camera *>(&knownCameras[packet.getName()]->getEntity());
             callback(cam);
         });
+
         phase = Run;
     }
 
@@ -94,27 +97,28 @@ namespace fengin::systems::SFMLSystems {
             event.layer = currentLayer;
             event.camData = &cam;
 
+            auto windowSize = realWindow->getSize();
             auto range = layout.equal_range(currentLayer);
             for (auto it = range.first; it != range.second; it++)
             {
-//                auto &obj = it->second->get<components::GameObject>();
-//                if (!obj.visible)
-//                    continue ;
-
                 auto &obj = it->second->get<components::GameObject>();
                 if (!obj.visible)
                     continue ;
                 auto &transform = it->second->get<components::Transform>();
-                float zoom = 50;
-                auto windowSize = realWindow->getSize();
+                float zoom = cam.zoom;
                 auto worldToScreen = [zoom, camPos, windowSize](vec3f world){
                     vec2f screen;
+
+                    world.x -= camPos.position.x;
+                    world.y -= camPos.position.y;
+
                     world.x *= zoom;
                     world.y *= zoom;
                     world.z *= zoom;
-                    screen.x = world.x - world.y - camPos.position.x * zoom + windowSize.x / 2;
-                    screen.y = (world.x + world.y) / 2 - camPos.position.y * zoom / 2 + windowSize.y / 2;
-                    screen.y -= world.z;
+
+                    screen.x = world.x - world.y + windowSize.x / 2;
+                    screen.y = (world.x + world.y) / 2 + windowSize.y / 4 * 3;
+                    screen.y = screen.y - world.z;
                     return screen;
                 };
                 auto getBoundingBox = [](const components::Transform &tr){
@@ -183,10 +187,15 @@ namespace fengin::systems::SFMLSystems {
                     realWindow->draw(line, 2, sf::Lines);
                 };
                 const auto box = getBoundingBox(transform);
-//                for (auto const &p: box) {
-//                    drawPoint(p.x, p.y, p.z, sf::Color::White);
-//                }
-
+                bool isVisible = true;
+                for (auto const &p: box) {
+                    if (p.x < 0 || p.y < 0
+                        || p.x > windowSize.x
+                        || p.y > windowSize.y)
+                        isVisible = false;
+                }
+                if (!isVisible)
+                    continue;
                 auto drawFace = [this, realWindow, worldToScreen](fengin::vec3f top, fengin::vec3f bottom, fengin::vec3f left, fengin::vec3f right, std::string const &path){
                     auto screenTop = worldToScreen(top);
                     auto screenBottom = worldToScreen(bottom);
@@ -201,9 +210,9 @@ namespace fengin::systems::SFMLSystems {
                     face[3].position = sf::Vector2f(screenLeft.x, screenLeft.y);
                     // TexCoords not normalized (not between 0..1)
                     face[0].texCoords = sf::Vector2f(0, 0);
-                    face[1].texCoords = sf::Vector2f(512, 0);
-                    face[2].texCoords = sf::Vector2f(512, 512);
-                    face[3].texCoords = sf::Vector2f(0, 512);
+                    face[1].texCoords = sf::Vector2f(64, 0);
+                    face[2].texCoords = sf::Vector2f(64, 64);
+                    face[3].texCoords = sf::Vector2f(0, 64);
                     RequestTexture request;
                     request.path = path;
                     request.call = [this, realWindow, face](sf::Texture *texture){
@@ -216,8 +225,8 @@ namespace fengin::systems::SFMLSystems {
                 };
 
                 drawFace(box[1], box[0], box[6], box[2], "grass.png");
-                drawFace(box[6], box[4], box[5], box[3], "dirt1.jpg");
-                drawFace(box[0], box[3], box[4], box[2], "dirt2.jpg");
+//                drawFace(box[6], box[4], box[5], box[3], "dirt1.jpg");
+//                drawFace(box[0], box[3], box[4], box[2], "dirt2.jpg");
 
                 if (it->second->has<components::Border>()) {
                     const auto &border = it->second->get<components::Border>();
@@ -236,10 +245,10 @@ namespace fengin::systems::SFMLSystems {
                     }
                 }
                 auto &absolute = it->second->get<components::AbsoluteTransform>();
-                absolute.position.x = (int)worldToScreen(box[0]).x - 32;
-                absolute.position.y = (int)worldToScreen(box[0]).y - 32;
-                absolute.size.w = 64;
-                absolute.size.h = 64;
+                absolute.size.w = static_cast<int>(transform.size.x * zoom);
+                absolute.size.h = static_cast<int>(transform.size.y * zoom / 2);
+                absolute.position.x = (int)worldToScreen(box[0]).x - absolute.size.w / 2 ;
+                absolute.position.y = (int)worldToScreen(box[0]).y - absolute.size.h;
 //                auto &absolute = it->second->get<components::AbsoluteTransform>();
 //                auto &transform = it->second->get<components::Transform>();
 //                auto windowSize = realWindow->getSize();
@@ -294,9 +303,6 @@ namespace fengin::systems::SFMLSystems {
         auto nearness = [](components::Transform const &tr){
             return (int)(tr.position.x + tr.position.y + tr.position.z);
         };
-//        auto aCloserThanB = [nearness](components::Transform const &a, components::Transform const &b) {
-//            return nearness(a) > nearness(b);
-//        };
         for (auto &go: gameObjects)
         {
             auto &entity = go->getEntity();

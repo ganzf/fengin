@@ -22,6 +22,7 @@ namespace fengin::components {
         };
 
         int viewDistance{10};
+        float zoom{100};
         bool debugMode{false};
         bool activated;
         FollowMode mode;
