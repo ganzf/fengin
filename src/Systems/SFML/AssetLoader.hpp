@@ -13,6 +13,11 @@ namespace fengin::systems::SFMLSystems
 
     };
 
+    struct RequestTexture {
+        std::string path;
+        std::function<void(sf::Texture *texture)> call;
+    };
+
     //TODO: Maybe 1 pkg for font and an other one for textures?
 
     struct AssetsLoaded {

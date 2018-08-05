@@ -19,6 +19,7 @@ namespace fengin::systems::SFMLSystems {
         };
         int state{Init};
 
+        std::unordered_map<std::string, sf::Texture> *_textures = nullptr;
         std::unordered_map<std::string, fengin::components::Camera *> knownCameras;
         std::unordered_map<futils::IEntity *, sf::RenderWindow *> camToWindow;
         std::unordered_multimap<int, futils::IEntity *> layout;

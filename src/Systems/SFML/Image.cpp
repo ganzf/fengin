@@ -48,7 +48,7 @@ namespace fengin::systems::SFMLSystems
 
         addReaction<AssetsLoaded>([this](futils::IMediatorPacket &pkg){
             auto &packet = futils::Mediator::rebuild<AssetsLoaded>(pkg);
-                _textures = packet.textures;
+            _textures = packet.textures;
         });
 
         events->send<RequestAssets>(RequestAssets());

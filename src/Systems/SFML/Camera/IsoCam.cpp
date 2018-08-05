@@ -3,6 +3,7 @@
 //
 
 #include <Systems/SFML/Window.hpp>
+#include <Systems/SFML/AssetLoader.hpp>
 #include "IsoCam.hpp"
 #include "Entities/Camera.hpp"
 #include "Camera.hpp"
@@ -111,8 +112,8 @@ namespace fengin::systems::SFMLSystems {
                     world.x *= zoom;
                     world.y *= zoom;
                     world.z *= zoom;
-                    screen.x = world.x - world.y + camPos.position.x + windowSize.x / 2;
-                    screen.y = (world.x + world.y) / 2 + camPos.position.y / 2 + windowSize.y / 2;
+                    screen.x = world.x - world.y - camPos.position.x * zoom + windowSize.x / 2;
+                    screen.y = (world.x + world.y) / 2 - camPos.position.y * zoom / 2 + windowSize.y / 2;
                     screen.y -= world.z;
                     return screen;
                 };
@@ -182,21 +183,63 @@ namespace fengin::systems::SFMLSystems {
                     realWindow->draw(line, 2, sf::Lines);
                 };
                 const auto box = getBoundingBox(transform);
-                for (auto const &p: box) {
-                    drawPoint(p.x, p.y, p.z, sf::Color::White);
+//                for (auto const &p: box) {
+//                    drawPoint(p.x, p.y, p.z, sf::Color::White);
+//                }
+
+                auto drawFace = [this, realWindow, worldToScreen](fengin::vec3f top, fengin::vec3f bottom, fengin::vec3f left, fengin::vec3f right, std::string const &path){
+                    auto screenTop = worldToScreen(top);
+                    auto screenBottom = worldToScreen(bottom);
+                    auto screenLeft = worldToScreen(left);
+                    auto screenRight = worldToScreen(right);
+                    // Simple quad
+                    sf::VertexArray face(sf::Quads, 4);
+                    // Positions
+                    face[0].position = sf::Vector2f(screenTop.x, screenTop.y);
+                    face[1].position = sf::Vector2f(screenRight.x, screenRight.y);
+                    face[2].position = sf::Vector2f(screenBottom.x, screenBottom.y);
+                    face[3].position = sf::Vector2f(screenLeft.x, screenLeft.y);
+                    // TexCoords not normalized (not between 0..1)
+                    face[0].texCoords = sf::Vector2f(0, 0);
+                    face[1].texCoords = sf::Vector2f(512, 0);
+                    face[2].texCoords = sf::Vector2f(512, 512);
+                    face[3].texCoords = sf::Vector2f(0, 512);
+                    RequestTexture request;
+                    request.path = path;
+                    request.call = [this, realWindow, face](sf::Texture *texture){
+                        if (texture)
+                            realWindow->draw(face, texture);
+                        else
+                            realWindow->draw(face);
+                    };
+                    events->send<RequestTexture>(request);
+                };
+
+                drawFace(box[1], box[0], box[6], box[2], "grass.png");
+                drawFace(box[6], box[4], box[5], box[3], "dirt1.jpg");
+                drawFace(box[0], box[3], box[4], box[2], "dirt2.jpg");
+
+                if (it->second->has<components::Border>()) {
+                    const auto &border = it->second->get<components::Border>();
+                    if (border.visible) {
+                        sf::Color c;
+                        c << border.color;
+                        drawLine(box[0], box[6], c);
+                        drawLine(box[6], box[1], c);
+                        drawLine(box[1], box[2], c);
+                        drawLine(box[0], box[2], c);
+                        drawLine(box[3], box[2], c);
+                        drawLine(box[3], box[4], c);
+                        drawLine(box[4], box[5], c);
+                        drawLine(box[5], box[6], c);
+                        drawLine(box[0], box[4], c);
+                    }
                 }
-
-                drawLine(box[0], box[6], sf::Color::Green);
-                drawLine(box[6], box[1], sf::Color::Green);
-                drawLine(box[1], box[2], sf::Color::Green);
-                drawLine(box[0], box[2], sf::Color::Green);
-                drawLine(box[3], box[2], sf::Color::Blue);
-                drawLine(box[3], box[4], sf::Color::Blue);
-                drawLine(box[4], box[5], sf::Color::Blue);
-                drawLine(box[5], box[6], sf::Color::Blue);
-                drawLine(box[0], box[4], sf::Color::Blue);
-
-
+                auto &absolute = it->second->get<components::AbsoluteTransform>();
+                absolute.position.x = (int)worldToScreen(box[0]).x - 32;
+                absolute.position.y = (int)worldToScreen(box[0]).y - 32;
+                absolute.size.w = 64;
+                absolute.size.h = 64;
 //                auto &absolute = it->second->get<components::AbsoluteTransform>();
 //                auto &transform = it->second->get<components::Transform>();
 //                auto windowSize = realWindow->getSize();
@@ -215,7 +258,6 @@ namespace fengin::systems::SFMLSystems {
 //
 //                    event.objects.push_back(it->second);
 //                }
-
             }
             event.window = realWindow;
             events->send<RenderLayer>(event);

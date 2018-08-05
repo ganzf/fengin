@@ -19,7 +19,7 @@ namespace fengin::systems::SFMLSystems
     {
     public:
         Camera();
-        void run(float) final {}
+        void run(float) final;
     };
 
     struct RenderLayer

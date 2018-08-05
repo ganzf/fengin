@@ -36,4 +36,23 @@ namespace fengin::systems::SFMLSystems
             });
         };
     }
+
+    void Camera::run(float) {
+        const auto &cameras = entityManager->get<fengin::components::Camera>();
+        for (auto &cam: cameras) {
+            if (cam->target) {
+                auto &targetTr = cam->target->get<fengin::components::Transform>();
+                auto &camPos = cam->getEntity().get<fengin::components::Transform>();
+//                Why 10.5 ?
+                auto &camBody = cam->getEntity().get<fengin::components::rigidBody>();
+                if (camPos.position.vecTo(targetTr.position).norm() > 10.5) {
+                    camBody.force.x = targetTr.position.x - camPos.position.x;
+                    camBody.force.y = targetTr.position.y - camPos.position.y;
+                } else {
+                    camBody.force.x = 0;
+                    camBody.force.y = 0;
+                }
+            }
+        }
+    }
 }

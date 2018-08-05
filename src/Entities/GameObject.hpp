@@ -8,6 +8,7 @@
 #include <Components/AbsoluteTransform.hpp>
 #include <Components/Border.hpp>
 #include <Components/ChildInfo.hpp>
+#include <Components/rigidBody.hpp>
 # include "fengin-core/include/FenginCore.hpp"
 # include "Components/GameObject.hpp"
 # include "Components/Transform.hpp"
@@ -125,7 +126,6 @@ namespace fengin::entities {
             auto &border = get<components::Border>();
             border.color = c;
         }
-
     };
 }
 

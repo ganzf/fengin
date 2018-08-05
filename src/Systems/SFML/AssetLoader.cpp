@@ -15,16 +15,24 @@ namespace fengin::systems::SFMLSystems
     void AssetLoader::init() {
         __init();
         addReaction<RequestAssets>([this](futils::IMediatorPacket &){
-                AssetsLoaded assets;
-                assets.fonts = &_fonts;
-                assets.textures = &_textures;
-                events->send<AssetsLoaded>(assets);
+            events->send<std::string>("Assets requested...");
+            AssetsLoaded assets;
+            assets.fonts = &_fonts;
+            assets.textures = &_textures;
+            events->send<std::string>("Sending assets...");
+            events->send<AssetsLoaded>(assets);
+            events->send<std::string>("Done.");
+        });
+
+        addReaction<RequestTexture>([this](futils::IMediatorPacket &pkg){
+            auto &packet = futils::Mediator::rebuild<RequestTexture>(pkg);
+            packet.call(&_textures[packet.path]);
         });
 
         std::regex patternTexture { ".*.[png|jpg|jpeg]" };
         std::regex patternFont { ".*.ttf" };
         // TODO: Make it easier to set the resources folder
-        std::string assetDir = "ressources/";
+        std::string assetDir = "resources/";
 
         try {
             std::experimental::filesystem::path path{assetDir.c_str()};
@@ -40,11 +48,11 @@ namespace fengin::systems::SFMLSystems
                     if (std::regex_match(file, patternTexture)) {
                         sf::Texture texture;
                         if (!texture.loadFromFile(pathFile)) {
-                            //events->send<std::string>("Texture " + file->d_name + " not found.");
+//                            events->send<std::string>("Texture [" + file + "] not found.");
                             continue;
                         }
-                        events->send<std::string>("Texture " + file + " loaded.");
                         _textures[file] = texture;
+                        events->send<std::string>("Texture [" + file + "] loaded.");
                     } else if (std::regex_match(file, patternFont)) {
                         sf::Font font;
                         if (!font.loadFromFile(pathFile)) {

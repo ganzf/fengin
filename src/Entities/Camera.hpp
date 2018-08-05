@@ -17,6 +17,7 @@ namespace fengin::entities {
             transform.position.z = 10;
             attach<components::Camera>();
             attach<components::Children>();
+            attach<components::rigidBody>();
         }
 
         Camera(fengin::entities::Window *win, std::string const &name = "Default") {
@@ -52,6 +53,10 @@ namespace fengin::entities {
             cam.name = name;
         }
 
+        void setFocusOn(fengin::entities::GameObject &gameObject) {
+            auto &cam = get<components::Camera>();
+            cam.target = &gameObject;
+        }
     };
 }
 
