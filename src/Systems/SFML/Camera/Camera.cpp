@@ -9,6 +9,7 @@
 #include "../Window.hpp"
 #include "NormalCam.hpp"
 #include "IsoCam.hpp"
+#include "OpenGL.hpp"
 
 using WorldAttached = futils::ComponentAttached<fengin::components::World>;
 using WorldDetached = futils::ComponentDeleted<fengin::components::World>;
@@ -23,7 +24,7 @@ namespace fengin::systems::SFMLSystems
                 if (world.compo.type == fengin::components::World::Type::Normal) {
                     entityManager->addSystem<fengin::systems::SFMLSystems::NormalCam>();
                 } else if (world.compo.type == fengin::components::World::Type::Isometric) {
-                    entityManager->addSystem<fengin::systems::SFMLSystems::IsoCam>();
+                    entityManager->addSystem<fengin::systems::SFMLSystems::OpenGL>();
                 }
             });
             addReaction<WorldDetached>([this](futils::IMediatorPacket &pkg){
@@ -31,7 +32,7 @@ namespace fengin::systems::SFMLSystems
                 if (world.compo.type == fengin::components::World::Type::Normal) {
                     entityManager->removeSystem("NormalCam");
                 } else if (world.compo.type == fengin::components::World::Type::Isometric) {
-                    entityManager->removeSystem("IsoCam");
+                    entityManager->removeSystem("OpenGL");
                 }
             });
         };

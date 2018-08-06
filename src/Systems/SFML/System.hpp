@@ -11,6 +11,7 @@ namespace fengin::systems::SFMLSystems
     class System : public futils::StateSystem
     {
     protected:
+        int phase{0};
         void shutdown()
         {
             entityManager->removeSystem(name);

@@ -18,6 +18,7 @@ namespace fengin::components {
         bool visible{false};
 
         // updated by [Window]
+        void *_actualWindow;
         vec2f actualPosition;
         vec2f actualSize;
         vec2f screenSize;

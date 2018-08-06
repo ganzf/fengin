@@ -36,11 +36,17 @@ namespace fengin::systems::SFMLSystems
         });
         addReaction<RequestWindow>([this](futils::IMediatorPacket &pkg){
             auto &request = futils::Mediator::rebuild<RequestWindow>(pkg);
+            ResponseWindow response;
+            if (request.camera == nullptr) {
+                response.camera = nullptr;
+                response.window = _windows.begin()->second.win;
+                events->send<ResponseWindow>(response);
+                return;
+            }
             auto &entity = request.camera;
             auto &cam = entity->get<components::Camera>();
             auto window = cam.window;
             auto &winCompo = window->get<components::Window>();
-            ResponseWindow response;
             response.camera = entity;
             response.window = _windows.at(&winCompo).win;
             events->send<ResponseWindow>(response);
@@ -103,7 +109,10 @@ namespace fengin::systems::SFMLSystems
         auto &data = *real.data;
         if (real.win == nullptr)
         {
-            real.win = new sf::RenderWindow(sf::VideoMode(data.size.w, data.size.h), data.title, styleToSfStyle[real.data->style]);
+            sf::ContextSettings settings;
+            settings.depthBits = 24;
+
+            real.win = new sf::RenderWindow(sf::VideoMode(data.size.w, data.size.h, 32), data.title, styleToSfStyle[real.data->style], settings);
             real.win->setFramerateLimit(60);
             if (real.win->isOpen()) {
                 data.isOpen = true;

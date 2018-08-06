@@ -55,5 +55,11 @@ namespace fengin::entities
             auto &win = get<fengin::components::Window>();
             win.title = title;
         }
+
+        template <typename WindowType>
+        WindowType *getWindowAs() {
+            auto &compo = get<components::Window>();
+            return static_cast<WindowType *>(compo._actualWindow);
+        }
     };
 }
