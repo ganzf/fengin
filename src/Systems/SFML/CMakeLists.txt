@@ -6,12 +6,20 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(OpenGL REQUIRED)
 message(OpenGL Found: ${OPENGL_FOUND})
 message(  Glu  Found: ${OPENGL_GLU_FOUND})
+find_library(SOIL SOIL HINTS ../../../libs/soil/lib)
+message( Soil  Found: ${SOIL})
 FILE (GLOB ENTITIES ../../Entities/*.hpp)
 FILE (GLOB COMPONENTS ../../Components/*.hpp)
 FILE (GLOB ISOSHAPES ./IsoShapes/*.hpp ./IsoShapes/*.cpp)
 FILE (GLOB SOURCES ./*.cpp ./*.hpp ./Camera/*.cpp ./Camera/*.hpp ${ENTITIES} ${COMPONENTS} ${ISOSHAPES})
-add_library(SFML SHARED ${SOURCES})
-include_directories(${OPENGL_INCLUDE_DIR})
-target_link_libraries(SFML -lstdc++fs ${OPENGL_LIBRARIES})
+
+# Trying this to link static into shared library
+#SET(SFML -Wl,-all ${SOIL} -Wl,-notall)
+
+include_directories(${OPENGL_INCLUDE_DIR} ../../../libs/soil/src)
+file(GLOB SOIL_SOURCES ../../../libs/soil/src/*.c)
+add_library(SFML SHARED ${SOURCES} ${SOIL_SOURCES})
+
+target_link_libraries(SFML -lstdc++fs ${OPENGL_LIBRARIES} ${SOIL})
 set_target_properties(SFML PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(SFML PROPERTIES PUBLIC_HEADER SFML.hpp)

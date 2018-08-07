@@ -10,7 +10,7 @@
 namespace fengin::systems::SFMLSystems
 {
     struct RequestAssets {
-
+        bool absolutePaths{false};
     };
 
     struct RequestTexture {

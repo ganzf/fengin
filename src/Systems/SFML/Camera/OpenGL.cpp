@@ -8,6 +8,8 @@
 #include <cmath>
 #include <utils/inputKeys.hpp>
 #include <Components/Transform.hpp>
+#include <Systems/SFML/AssetLoader.hpp>
+#include <SOIL.h>
 #include "OpenGL.hpp"
 #include "Camera.hpp"
 #include "Entities/Camera.hpp"
@@ -59,8 +61,33 @@ namespace fengin::systems::SFMLSystems {
             std::cout << "version:" << settings.majorVersion << "." << settings.minorVersion << std::endl;
             this->setupOpenGlVertices();
         });
-        events->send<RequestWindow>();
+        addReaction<AssetsLoaded>([this](futils::IMediatorPacket &pkg){
+            const auto &packet = futils::Mediator::rebuild<AssetsLoaded>(pkg);
+            for (auto &texture: *packet.textures) {
+                GLuint textureId = SOIL_load_OGL_texture(
+                        std::string("./resources/" + texture.first).c_str(),
+                                SOIL_LOAD_AUTO,
+                                SOIL_CREATE_NEW_ID,
+                                SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+                        );
 
+                /* check for an error during the load process */
+                if( 0 == textureId )
+                {
+                    std::cerr << "SOIL loading error: " << SOIL_last_result() << std::endl;
+                } else {
+                    events->send<std::string>("Texture " + texture.first + " loaded into OpenGL with soil and id " + std::to_string(textureId));
+                    this->loadedGlTextures[texture.first] = textureId;
+                }
+                std::cout << "Received texture " << texture.first << " in openGL " << std::endl;
+//                this->loadedGlTextures[texture.first] = texture.second;
+            }
+            glBindTexture(GL_TEXTURE0, loadedGlTextures["wood.png"]);
+            glBindTexture(GL_TEXTURE1, loadedGlTextures["gras.png"]);
+            glBindTexture(GL_TEXTURE2, loadedGlTextures["dirt1.png"]);
+        });
+        events->send<RequestWindow>();
+        events->send<RequestAssets>();
     }
 
     void OpenGL::setupOpenGlVertices() {
@@ -74,7 +101,7 @@ namespace fengin::systems::SFMLSystems {
         glDepthFunc(GL_LEQUAL);
         glDepthMask(GL_TRUE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
+//        glEnable(GL_BLEND);
 
         GLint viewport[4];
         glGetIntegerv( GL_VIEWPORT, viewport );
@@ -88,80 +115,125 @@ namespace fengin::systems::SFMLSystems {
         glOrtho(-ortho_width / 2, ortho_width / 2, -ortho_height/2, ortho_height/2, -1250.0f, 1250.0f);
     }
 
-    void OpenGL::renderTile(float x, float y, float z, float ry = -45) {
-        auto const zoom = 45.0f;
+    void OpenGL::renderTile(vec3f pos, vec3f size, vec3f rot, const components::Box &box) {
+        auto &camPos = cam->get<components::Transform>().position;
+        const auto &camC = cam->get<fengin::components::Camera>();
+        auto const zoom = camC.zoom;
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glTranslatef(0,0,-100);
+        glTranslatef(0, 0, -100);
         glRotatef(30, 1, 0, 0);
-        glRotatef(ry, 0, 1, 0);
-        glTranslatef(-x * zoom * 2, y * zoom * 2, z * zoom * 2);
+        glRotatef(rot.z - 45.0f, 0, 1, 0);
+        glTranslatef(-(pos.x - camPos.x) * zoom * 2, (pos.z - camPos.z) * zoom * 2, (pos.y - camPos.y) * zoom * 2);
 //        glLoadIdentity();
 ////        make a 0,0,0 cube appear at the center of the screen instead of around the camera
 //        glTranslatef(x, y, z);
 ////        This would be the size of the cube ! with a base of 10
-        glScalef(zoom, zoom, zoom);
-//        glRotatef(60, 1.f, 0.f, 0.f);
-//        glRotatef(ry, 0.f, 1.f, 0.f);
-
-//        glRotatef(60,1,0,0);
-
-//        glRotatef(angle * 90, 0.f, 0.f, 1.f);
-
-
+        glScalef(zoom * size.x, zoom * size.z, zoom * size.y);
 
         //Draw a cube
-        glBegin(GL_QUADS);//draw some squares
+        glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
+//        glBegin(GL_LINES);
+//        sf::Texture::bind((const sf::Texture *) &loadedGlTextures["grass.png"]);
 
-        // TOP RIGHT FACE
-        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
-        glVertex3f(-1.f, -1.f, -1.f);
-        glVertex3f(-1.f,  1.f, -1.f);
-        glVertex3f( 1.f,  1.f, -1.f);
-        glVertex3f( 1.f, -1.f, -1.f);
+        // Front Face
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left
+        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right
+        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Left
+        // Back Face
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Right
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right
+        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left
+        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left
+        // Top Face
+//        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["dirt1.png"]);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left
+        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right
+        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+//        // Bottom Face
+//        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right
+//        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left
+//        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
+//        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right
+//        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["dirt1.png"]);
+        // Right face
+        glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Right
+        glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Left
+        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
+        // Left Face
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Bottom Left
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Right
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Top Right
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
 
-        // BOTTOM LEFT FACE
-        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
-        glVertex3f( 1.f, -1.f, 1.f);
-        glVertex3f( 1.f,  1.f, 1.f);
-        glVertex3f(-1.f,  1.f, 1.f);
-        glVertex3f(-1.f, -1.f, 1.f);
-
-        // TOP LEFT FACE
-        glColor3f(124.0f / 255.0f, 94.0f / 255.0f, 66.0f / 255.0f); // dirt
-        glVertex3f(-1.f, -1.f,  1.f);
-        glVertex3f(-1.f,  1.f,  1.f);
-        glVertex3f(-1.f,  1.f, -1.f);
-        glVertex3f(-1.f, -1.f, -1.f);
-
-        // BOTTOM RIGHT FACE
-        glColor3f(124.0f / 255.0f, 94.0f / 255.0f, 66.0f / 255.0f); // dark dirt
-        glVertex3f(1.f, -1.f, -1.f);
-        glVertex3f(1.f,  1.f, -1.f);
-        glVertex3f(1.f,  1.f,  1.f);
-        glVertex3f(1.f, -1.f,  1.f);
-
-
-        // Ever so useless BOTTOM FACE
+//        // TOP RIGHT FACE
 //        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
-//        glVertex3f(-1.f, -1.f,  1.f);
 //        glVertex3f(-1.f, -1.f, -1.f);
+//        glVertex3f(-1.f,  1.f, -1.f);
+//        glVertex3f( 1.f,  1.f, -1.f);
 //        glVertex3f( 1.f, -1.f, -1.f);
-//        glVertex3f( 1.f, -1.f,  1.f);
-
-        // TOP FACE
-        glColor3f(0, 86.0f / 255, 0); //green
-        glVertex3f( 1.f, 1.f,  1.f);
-        glVertex3f( 1.f, 1.f, -1.f);
-        glVertex3f(-1.f, 1.f, -1.f);
-        glVertex3f(-1.f, 1.f,  1.f);
+//
+//        // BOTTOM LEFT FACE
+//        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
+//        glVertex3f( 1.f, -1.f, 1.f);
+//        glVertex3f( 1.f,  1.f, 1.f);
+//        glVertex3f(-1.f,  1.f, 1.f);
+//        glVertex3f(-1.f, -1.f, 1.f);
+//
+//        // TOP LEFT FACE
+//        glColor3f(124.0f / 255.0f, 94.0f / 255.0f, 66.0f / 255.0f); // dirt
+//        glVertex3f(-1.f, -1.f,  1.f);
+//        glVertex3f(-1.f,  1.f,  1.f);
+//        glVertex3f(-1.f,  1.f, -1.f);
+//        glVertex3f(-1.f, -1.f, -1.f);
+//
+//        // BOTTOM RIGHT FACE
+//        glColor3f(124.0f / 255.0f, 94.0f / 255.0f, 66.0f / 255.0f); // dark dirt
+//        glVertex3f(1.f, -1.f, -1.f);
+//        glVertex3f(1.f,  1.f, -1.f);
+//        glVertex3f(1.f,  1.f,  1.f);
+//        glVertex3f(1.f, -1.f,  1.f);
+//
+//
+//        // Ever so useless BOTTOM FACE
+////        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
+////        glVertex3f(-1.f, -1.f,  1.f);
+////        glVertex3f(-1.f, -1.f, -1.f);
+////        glVertex3f( 1.f, -1.f, -1.f);
+////        glVertex3f( 1.f, -1.f,  1.f);
+//
+//        // TOP FACE
+//        if (!box.wireframe) {
+//            sf::Texture::bind((const sf::Texture *) &loadedGlTextures["grass.png"]);
+////            glTexCoord2f(0.0f, 1.0f);
+////            glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
+////            glTexCoord2f(0.0f, 0.0f);
+////            glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left
+////            glTexCoord2f(1.0f, 0.0f);
+////            glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right
+////            glTexCoord2f(1.0f, 1.0f);
+////            glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+//        } else {
+//            glColor3f(0, 86.0f / 255, 0); //green
+//        }
+//        glTexCoord2f(0.0f, 0.0f);
+//        glVertex3f(1.f, 1.f, 1.f);
+//        glTexCoord2f(1.0f, 0.0f);
+//        glVertex3f(1.f, 1.f, -1.f);
+//        glTexCoord2f(1.0f, 1.0f);
+//        glVertex3f(-1.f, 1.f, -1.f);
+//        glTexCoord2f(0.0f, 1.0f);
+//        glVertex3f(-1.f, 1.f, 1.f);
 
         glEnd();
 
         glBegin(GL_LINES);
         const auto hoveringHeight = 0.05f;
         const auto transparency = 0.25f;
-        glColor4f(0.9, 0.9, 0.9, transparency); // whitish grid
+//        glColor4f(0.9, 0.9, 0.9, transparency); // whitish grid
         // 1 - 2
         glVertex3f( 1.f, 1.0f + hoveringHeight,  1.f);
         glVertex3f( 1.f, 1.0f + hoveringHeight, -1.f);
@@ -191,12 +263,16 @@ namespace fengin::systems::SFMLSystems {
         // Clear color and depth buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         auto go = entityManager->get<fengin::components::GameObject>();
-        auto &camPos = cam->get<components::Transform>();
         for (auto &obj: go) {
             if (!obj->visible)
                 continue;
             auto &tr = obj->getEntity().get<components::Transform>();
-            renderTile(tr.position.x - camPos.position.x, tr.position.z - camPos.position.z, tr.position.y - camPos.position.y);
+//            If the gameObject has a component Billboard draw it like a billboard (1 texture)
+            if (obj->getEntity().has<components::Box>())
+                renderTile(tr.position, tr.size, tr.rotation, obj->getEntity().get<components::Box>());
+//            else if (obj->has<components::Billboard>())
+//            renderTile(tr.position.x - camPos.position.x, tr.position.z - camPos.position.z, tr.position.y - camPos.position.y,
+//            tr.size.x, tr.size.z, tr.size.y);
         }
         win->display();
     }

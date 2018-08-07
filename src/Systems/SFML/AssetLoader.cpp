@@ -14,8 +14,12 @@ namespace fengin::systems::SFMLSystems
 {
     void AssetLoader::init() {
         __init();
-        addReaction<RequestAssets>([this](futils::IMediatorPacket &){
-            events->send<std::string>("Assets requested...");
+        addReaction<RequestAssets>([this](futils::IMediatorPacket &pkg){
+            const auto &packet = futils::Mediator::rebuild<RequestAssets>(pkg);
+            if (packet.absolutePaths)
+                events->send<std::string>("Assets requested with absolute paths...");
+            else
+                events->send<std::string>("Assets requested...");
             AssetsLoaded assets;
             assets.fonts = &_fonts;
             assets.textures = &_textures;
