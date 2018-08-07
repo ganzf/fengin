@@ -73,6 +73,8 @@ namespace fengin::systems::SFMLSystems {
 //        glDepthFunc(GL_LESS);
         glDepthFunc(GL_LEQUAL);
         glDepthMask(GL_TRUE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
 
         GLint viewport[4];
         glGetIntegerv( GL_VIEWPORT, viewport );
@@ -110,36 +112,44 @@ namespace fengin::systems::SFMLSystems {
 
         //Draw a cube
         glBegin(GL_QUADS);//draw some squares
-        glColor3f(155.0f / 255.0f,118.0f / 255.0f ,83.0f / 255.0f); // dirt
+
+        // TOP RIGHT FACE
+        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
         glVertex3f(-1.f, -1.f, -1.f);
         glVertex3f(-1.f,  1.f, -1.f);
         glVertex3f( 1.f,  1.f, -1.f);
         glVertex3f( 1.f, -1.f, -1.f);
 
-        glColor3f(124.0f / 255.0f,94.0f / 255.0f ,66.0f / 255.0f); // dirt
+        // BOTTOM LEFT FACE
+        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
         glVertex3f( 1.f, -1.f, 1.f);
         glVertex3f( 1.f,  1.f, 1.f);
         glVertex3f(-1.f,  1.f, 1.f);
         glVertex3f(-1.f, -1.f, 1.f);
 
-        glColor3f(124.0f / 255.0f,94.0f / 255.0f ,66.0f / 255.0f); // dirt
+        // TOP LEFT FACE
+        glColor3f(124.0f / 255.0f, 94.0f / 255.0f, 66.0f / 255.0f); // dirt
         glVertex3f(-1.f, -1.f,  1.f);
         glVertex3f(-1.f,  1.f,  1.f);
         glVertex3f(-1.f,  1.f, -1.f);
         glVertex3f(-1.f, -1.f, -1.f);
 
-        glColor3f(124.0f / 255.0f,94.0f / 255.0f ,66.0f / 255.0f); // dirt
+        // BOTTOM RIGHT FACE
+        glColor3f(124.0f / 255.0f, 94.0f / 255.0f, 66.0f / 255.0f); // dark dirt
         glVertex3f(1.f, -1.f, -1.f);
         glVertex3f(1.f,  1.f, -1.f);
         glVertex3f(1.f,  1.f,  1.f);
         glVertex3f(1.f, -1.f,  1.f);
 
-        glColor3f(124.0f / 255.0f,94.0f / 255.0f ,66.0f / 255.0f); // dirt
-        glVertex3f(-1.f, -1.f,  1.f);
-        glVertex3f(-1.f, -1.f, -1.f);
-        glVertex3f( 1.f, -1.f, -1.f);
-        glVertex3f( 1.f, -1.f,  1.f);
 
+        // Ever so useless BOTTOM FACE
+//        glColor3f(155.0f / 255.0f, 118.0f / 255.0f, 83.0f / 255.0f); // dirt
+//        glVertex3f(-1.f, -1.f,  1.f);
+//        glVertex3f(-1.f, -1.f, -1.f);
+//        glVertex3f( 1.f, -1.f, -1.f);
+//        glVertex3f( 1.f, -1.f,  1.f);
+
+        // TOP FACE
         glColor3f(0, 86.0f / 255, 0); //green
         glVertex3f( 1.f, 1.f,  1.f);
         glVertex3f( 1.f, 1.f, -1.f);
@@ -149,19 +159,21 @@ namespace fengin::systems::SFMLSystems {
         glEnd();
 
         glBegin(GL_LINES);
-        glColor3f(0.9, 0.9, 0.9); // whitish grid
+        const auto hoveringHeight = 0.05f;
+        const auto transparency = 0.25f;
+        glColor4f(0.9, 0.9, 0.9, transparency); // whitish grid
         // 1 - 2
-        glVertex3f( 1.f, 1.02f,  1.f);
-        glVertex3f( 1.f, 1.02f, -1.f);
+        glVertex3f( 1.f, 1.0f + hoveringHeight,  1.f);
+        glVertex3f( 1.f, 1.0f + hoveringHeight, -1.f);
         // 2 - 3
-        glVertex3f(-1.f, 1.02f, -1.f);
-        glVertex3f( 1.f, 1.02f, -1.f);
+        glVertex3f(-1.f, 1.0f + hoveringHeight, -1.f);
+        glVertex3f( 1.f, 1.0f + hoveringHeight, -1.f);
         // 3 - 4
-        glVertex3f(-1.f, 1.02f, -1.f);
-        glVertex3f(-1.f, 1.02f,  1.f);
+        glVertex3f(-1.f, 1.0f + hoveringHeight, -1.f);
+        glVertex3f(-1.f, 1.0f + hoveringHeight,  1.f);
         // 4 - 1
-        glVertex3f(-1.f, 1.02f,  1.f);
-        glVertex3f( 1.f, 1.02f,  1.f);
+        glVertex3f(-1.f, 1.0f + hoveringHeight,  1.f);
+        glVertex3f( 1.f, 1.0f + hoveringHeight,  1.f);
         glEnd();
     }
 
