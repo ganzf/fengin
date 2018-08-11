@@ -51,11 +51,11 @@ namespace fengin::systems::SFMLSystems {
     {
         __init();
         addReaction<events::ChangeGridColor>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<events::ChangeGridColor>(pkg);
+            auto &packet = EventManager::rebuild<events::ChangeGridColor>(pkg);
             this->color = packet.color;
         });
         addReaction<AllLayersRendered>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<AllLayersRendered>(pkg);
+            auto &packet = EventManager::rebuild<AllLayersRendered>(pkg);
             if (!packet.window || !packet.camData)
                 return ;
             draw(*packet.window, *packet.camData);

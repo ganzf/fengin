@@ -7,7 +7,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct GameObject : futils::IComponent {
+    struct GameObject : Component {
         bool visible{true};
         void show() {
             visible = true;

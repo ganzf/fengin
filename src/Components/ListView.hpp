@@ -9,7 +9,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct ListView : futils::IComponent {
+    struct ListView : Component {
         std::string name;
         int offset{0};
         int size{0};

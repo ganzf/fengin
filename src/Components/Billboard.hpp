@@ -7,7 +7,7 @@
 # include <fengin-core/include/FenginCore.hpp>
 
 namespace fengin::components {
-    struct Billboard : public futils::IComponent {
+    struct Billboard : public Component {
         bool isVertical;
         float alpha;
         vec2i texCoords;

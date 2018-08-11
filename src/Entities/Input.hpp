@@ -9,7 +9,7 @@
 
 namespace fengin::entities
 {
-    class Input : public futils::IEntity
+    class Input : public Entity
     {
     public:
         Input() {

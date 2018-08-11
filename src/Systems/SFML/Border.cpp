@@ -50,7 +50,7 @@ namespace fengin::systems::SFMLSystems
     void Border::init() {
         __init();
         addReaction<RenderLayer>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<RenderLayer>(pkg);
+            auto &packet = EventManager::rebuild<RenderLayer>(pkg);
             for (auto &obj: packet.objects)
             {
                 if (!obj->has<components::Border>())

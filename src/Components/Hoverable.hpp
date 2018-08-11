@@ -7,7 +7,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct Hoverable : futils::IComponent {
+    struct Hoverable : Component {
         using Action = std::function<void()>;
 
         Action onHover{[](){}};

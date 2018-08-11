@@ -68,7 +68,7 @@ namespace fengin::systems::SFMLSystems
         addReaction<RenderLayer>([this](futils::IMediatorPacket &pkg){
             if (_fonts == nullptr)
                 return;
-            auto &packet = futils::Mediator::rebuild<RenderLayer>(pkg);
+            auto &packet = EventManager::rebuild<RenderLayer>(pkg);
             for (auto &obj: packet.objects)
             {
                 if (!obj->has<components::Text>())
@@ -79,7 +79,7 @@ namespace fengin::systems::SFMLSystems
         });
 
         addReaction<AssetsLoaded>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<AssetsLoaded>(pkg);
+            auto &packet = EventManager::rebuild<AssetsLoaded>(pkg);
             _fonts = packet.fonts;
         });
 

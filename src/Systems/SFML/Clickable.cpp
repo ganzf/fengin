@@ -12,7 +12,7 @@ namespace fengin::systems::SFMLSystems
     void Clickable::init() {
         __init();
         addReaction<futils::MouseClicked>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<futils::MouseClicked>(pkg);
+            auto &packet = EventManager::rebuild<futils::MouseClicked>(pkg);
             auto clickables = entityManager->get<components::Clickable>();
 
             for (auto &click : clickables)
@@ -26,7 +26,7 @@ namespace fengin::systems::SFMLSystems
             }
         });
         addReaction<futils::MouseReleased>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<futils::MouseReleased>(pkg);
+            auto &packet = EventManager::rebuild<futils::MouseReleased>(pkg);
             auto clickables = entityManager->get<components::Clickable>();
 
             for (auto &click : clickables)

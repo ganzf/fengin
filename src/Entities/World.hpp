@@ -8,7 +8,7 @@
 # include "Components/World.hpp"
 
 namespace fengin::entities {
-    class World : public futils::IEntity {
+    class World : public Entity {
     public:
         World() {
             attach<components::World>();

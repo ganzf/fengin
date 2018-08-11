@@ -14,11 +14,11 @@ namespace fengin::entities
 }
 
 namespace fengin::components {
-    struct ChildInfo : futils::IComponent {
+    struct ChildInfo : Component {
         vec3f offset;
         vec3f relSize;
         bool isGridRelative{false};
-        futils::IEntity *parent{nullptr};
+        Entity *parent{nullptr};
     };
 }
 

@@ -13,7 +13,7 @@ namespace fengin::entities
 }
 
 namespace fengin::components {
-    struct Camera : futils::IComponent {
+    struct Camera : Component {
         enum FollowMode
         {
             Instant,

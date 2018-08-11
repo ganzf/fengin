@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <utils/ecs.hpp>
+#include <fengin-core/include/ecs.hpp>
 #include <Components/Transform.hpp>
 
 namespace fengin::entities {
-    class Block: public futils::IEntity {
+    class Block: public Entity {
     public:
         explicit Block() {
             auto &tr = attach<fengin::components::Transform>();

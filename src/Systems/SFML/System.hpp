@@ -8,7 +8,7 @@
 
 namespace fengin::systems::SFMLSystems
 {
-    class System : public futils::StateSystem
+    class System : public fengin::System
     {
     protected:
         int phase{0};

@@ -19,7 +19,7 @@
 #include "GameObject.hpp"
 #include "Sprite.hpp"
 
-extern "C" futils::ISystem *build()
+extern "C" fengin::System *build()
 {
     return new fengin::systems::SFMLRenderer();
 }

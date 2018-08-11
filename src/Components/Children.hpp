@@ -14,7 +14,7 @@ namespace fengin::entities
 }
 
 namespace fengin::components {
-    struct Children : futils::IComponent {
+    struct Children : Component {
         std::unordered_map<entities::GameObject *, entities::GameObject *> content;
         void add(entities::GameObject &obj);
         void remove(entities::GameObject &obj);

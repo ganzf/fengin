@@ -15,18 +15,18 @@ namespace fengin::systems::SFMLSystems
 {
     struct RequestWindow
     {
-        futils::IEntity *camera;
+        Entity *camera;
     };
 
     struct ResponseWindow
     {
-        futils::IEntity *camera;
+        Entity *camera;
         sf::RenderWindow *window;
     };
 
     struct ClearWindow
     {
-        futils::IEntity *camera;
+        Entity *camera;
     };
 
     class Window : public System

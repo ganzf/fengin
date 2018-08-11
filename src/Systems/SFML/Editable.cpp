@@ -13,7 +13,7 @@ namespace fengin::systems::SFMLSystems
     void Editable::init() {
         __init();
         addReaction<futils::MouseReleased>([this](futils::IMediatorPacket &pkg){
-            auto &mouse = futils::Mediator::rebuild<futils::MouseReleased>(pkg);
+            auto &mouse = EventManager::rebuild<futils::MouseReleased>(pkg);
             auto editables = entityManager->get<components::Editable>();
             for (auto editable: editables) {
                 auto &absolute = editable->getEntity().get<components::AbsoluteTransform>();
@@ -25,7 +25,7 @@ namespace fengin::systems::SFMLSystems
             }
         });
         addReaction<futils::Keys>([this](futils::IMediatorPacket &pkg){
-            auto &key = futils::Mediator::rebuild<futils::Keys>(pkg);
+            auto &key = EventManager::rebuild<futils::Keys>(pkg);
             char letter = -1;
             if (key == futils::Keys::Backspace)
                 letter = 0;

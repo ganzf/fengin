@@ -16,7 +16,7 @@
 // 5 - bottom
 // Each has a texture, an alpha modifier.
 namespace fengin::components {
-    struct Box : public futils::IComponent {
+    struct Box : public Component {
         bool wireframe{false};
         std::array<std::string, 6> textures;
         std::array<vec2i, 6> texturesCoords;

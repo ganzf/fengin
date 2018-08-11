@@ -8,7 +8,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct rigidBody : futils::IComponent {
+    struct rigidBody : Component {
         float weight;
         vec3f force;
     };

@@ -10,7 +10,7 @@
 
 namespace fengin::components
 {
-    struct Border : futils::IComponent
+    struct Border : Component
     {
         bool right{true};
         bool left{true};

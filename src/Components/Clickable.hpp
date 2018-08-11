@@ -8,7 +8,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct Clickable : futils::IComponent {
+    struct Clickable : Component {
         bool waitForRelease{false};
         std::function<void()> func;
     };

@@ -2,18 +2,18 @@
 // Created by arroganz on 12/16/17.
 //
 
-#ifndef FENGIN_LOG_HPP
-#define FENGIN_LOG_HPP
+#pragma once
+# include "fengin-core/include/ecs.hpp"
 
-#include "utils/ecs.hpp"
+namespace fengin {
+    class Log : public System {
+        int phase{0};
 
-class Log : public futils::ISystem {
-    int phase{0};
-    void init();
-public:
-    Log();
+        void init();
 
-    void run(float) final;
-};
+    public:
+        Log();
 
-#endif //FENGIN_LOG_HPP
+        void run(float) final;
+    };
+}

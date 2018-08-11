@@ -21,13 +21,13 @@ namespace fengin::systems::SFMLSystems {
 
         std::unordered_map<std::string, sf::Texture> *_textures = nullptr;
         std::unordered_map<std::string, fengin::components::Camera *> knownCameras;
-        std::unordered_map<futils::IEntity *, sf::RenderWindow *> camToWindow;
-        std::unordered_multimap<int, futils::IEntity *> layout;
+        std::unordered_map<Entity *, sf::RenderWindow *> camToWindow;
+        std::unordered_multimap<int, Entity *> layout;
 
-        void renderWindow(futils::IEntity &cam);
+        void renderWindow(Entity &cam);
         void drawCamCrosshair(components::Camera &, sf::RenderWindow *);
         void sortGameObjects();
-        void renderCam(futils::IEntity &, components::Camera &, components::World &);
+        void renderCam(Entity &, components::Camera &, components::World &);
         void renderEachCam();
         void init();
     public:

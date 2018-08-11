@@ -14,7 +14,7 @@
 # include "Components/Transform.hpp"
 
 namespace fengin::entities {
-    class GameObject : public futils::IEntity {
+    class GameObject : public Entity {
 
     public:
         GameObject() {

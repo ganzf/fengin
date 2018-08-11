@@ -33,7 +33,7 @@ namespace fengin::systems::SFMLSystems
     void Hoverable::init() {
         __init();
         addReaction<futils::MouseMoved>([this](futils::IMediatorPacket &pkg) {
-            auto &packet = futils::Mediator::rebuild<futils::MouseMoved>(pkg);
+            auto &packet = EventManager::rebuild<futils::MouseMoved>(pkg);
             update(packet);
         });
         phase = Run;

@@ -8,7 +8,7 @@
 
 namespace fengin::components
 {
-    class Text : public futils::IComponent {
+    class Text : public Component {
     public:
         futils::TextStyle   style;
         std::string         str;

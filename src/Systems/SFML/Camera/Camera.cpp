@@ -11,8 +11,8 @@
 #include "IsoCam.hpp"
 #include "OpenGL.hpp"
 
-using WorldAttached = futils::ComponentAttached<fengin::components::World>;
-using WorldDetached = futils::ComponentDeleted<fengin::components::World>;
+using WorldAttached = fengin::ComponentAttached<fengin::components::World>;
+using WorldDetached = fengin::ComponentDeleted<fengin::components::World>;
 
 namespace fengin::systems::SFMLSystems
 {
@@ -20,7 +20,7 @@ namespace fengin::systems::SFMLSystems
         afterBuild = [this](){
             __init();
             addReaction<WorldAttached>([this](futils::IMediatorPacket &pkg){
-                auto &world = futils::Mediator::rebuild<WorldAttached>(pkg);
+                auto &world = EventManager::rebuild<WorldAttached>(pkg);
                 if (world.compo.type == fengin::components::World::Type::Normal) {
                     entityManager->addSystem<fengin::systems::SFMLSystems::NormalCam>();
                 } else if (world.compo.type == fengin::components::World::Type::Isometric) {
@@ -28,7 +28,7 @@ namespace fengin::systems::SFMLSystems
                 }
             });
             addReaction<WorldDetached>([this](futils::IMediatorPacket &pkg){
-                auto &world = futils::Mediator::rebuild<WorldDetached >(pkg);
+                auto &world = EventManager::rebuild<WorldDetached >(pkg);
                 if (world.compo.type == fengin::components::World::Type::Normal) {
                     entityManager->removeSystem("NormalCam");
                 } else if (world.compo.type == fengin::components::World::Type::Isometric) {

@@ -15,7 +15,7 @@ namespace fengin::systems::SFMLSystems {
     {
         __init();
         addReaction<ResponseWindow>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<ResponseWindow>(pkg);
+            auto &packet = EventManager::rebuild<ResponseWindow>(pkg);
             camToWindow[packet.camera] = packet.window;
             auto worlds = entityManager->get<components::World>();
             if (worlds.empty())
@@ -26,7 +26,7 @@ namespace fengin::systems::SFMLSystems {
             transform.size.h = packet.window->getSize().y / unit;
         });
         addReaction<fengin::events::RequestCamera>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<fengin::events::RequestCamera>(pkg);
+            auto &packet = EventManager::rebuild<fengin::events::RequestCamera>(pkg);
             auto callback = packet.getCallback();
             if (knownCameras.find(packet.getName()) == knownCameras.end())
                 return ;
@@ -37,7 +37,7 @@ namespace fengin::systems::SFMLSystems {
         phase = Run;
     }
 
-    void IsoCam::renderWindow(futils::IEntity &cam)
+    void IsoCam::renderWindow(Entity &cam)
     {
         auto win = camToWindow[&cam];
         if (win)
@@ -71,7 +71,7 @@ namespace fengin::systems::SFMLSystems {
         }
     }
 
-    void IsoCam::renderCam(futils::IEntity &entity, components::Camera &cam, components::World &world)
+    void IsoCam::renderCam(Entity &entity, components::Camera &cam, components::World &world)
     {
         RequestWindow request;
         request.camera = &entity;
@@ -309,7 +309,7 @@ namespace fengin::systems::SFMLSystems {
             if (!entity.has<components::Transform>())
                 throw std::logic_error("Game object missing transform component in [Camera].");
             auto &transform = entity.get<components::Transform>();
-            layout.insert(std::pair<int, futils::IEntity *>(nearness(transform), &entity));
+            layout.insert(std::pair<int, Entity *>(nearness(transform), &entity));
         }
     }
 

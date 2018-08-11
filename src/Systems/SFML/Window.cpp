@@ -3,9 +3,9 @@
 //
 
 #include "Components/Window.hpp"
-#include "Window.hpp"
 #include "Entities/Camera.hpp"
 #include "Camera/Camera.hpp"
+#include "Window.hpp"
 
 namespace
 {
@@ -22,7 +22,7 @@ namespace fengin::systems::SFMLSystems
     void Window::requireEvents()
     {
         addReaction<ClearWindow>([this](futils::IMediatorPacket &pkg) {
-            auto &packet = futils::Mediator::rebuild<ClearWindow>(pkg);
+            auto &packet = EventManager::rebuild<ClearWindow>(pkg);
             auto &entity = packet.camera;
             auto &cam = entity->get<components::Camera>();
             auto window = cam.window;
@@ -35,7 +35,7 @@ namespace fengin::systems::SFMLSystems
             }
         });
         addReaction<RequestWindow>([this](futils::IMediatorPacket &pkg){
-            auto &request = futils::Mediator::rebuild<RequestWindow>(pkg);
+            auto &request = EventManager::rebuild<RequestWindow>(pkg);
             ResponseWindow response;
             if (request.camera == nullptr) {
                 response.camera = nullptr;
@@ -51,18 +51,18 @@ namespace fengin::systems::SFMLSystems
             response.window = _windows.at(&winCompo).win;
             events->send<ResponseWindow>(response);
         });
-        addReaction<futils::ComponentAttached<Component>>([this](futils::IMediatorPacket &pkg){
+        addReaction<fengin::ComponentAttached<Component>>([this](futils::IMediatorPacket &pkg){
             auto components = entityManager->get<Component>();
-            auto &packet = futils::Mediator::rebuild<futils::ComponentAttached<Component>>(pkg);
+            auto &packet = EventManager::rebuild<fengin::ComponentAttached<Component>>(pkg);
             for (auto &win: components)
             {
                 if (win->title == packet.compo.title)
                     onNewWindow(*win);
             }
         });
-        addReaction<futils::ComponentDeleted<Component>>([this](futils::IMediatorPacket &pkg){
+        addReaction<fengin::ComponentDeleted<Component>>([this](futils::IMediatorPacket &pkg){
             auto components = entityManager->get<Component>();
-            auto &packet = futils::Mediator::rebuild<futils::ComponentDeleted<Component>>(pkg);
+            auto &packet = EventManager::rebuild<fengin::ComponentDeleted<Component>>(pkg);
             Component *toRemove = nullptr;
             for (auto pair: _windows)
             {

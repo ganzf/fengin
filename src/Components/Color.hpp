@@ -8,7 +8,7 @@
 # include "utils/rendering.hpp"
 
 namespace fengin::components {
-    struct Color : futils::IComponent {
+    struct Color : Component {
         futils::Color color;
     };
 }

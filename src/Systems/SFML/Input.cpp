@@ -132,7 +132,7 @@ namespace fengin::systems::SFMLSystems
     {
         __init();
         addReaction<sf::Event>([this](futils::IMediatorPacket &pkg){
-            auto &event = futils::Mediator::rebuild<sf::Event>(pkg);
+            auto &event = EventManager::rebuild<sf::Event>(pkg);
             process(event);
         });
         phase = Run;

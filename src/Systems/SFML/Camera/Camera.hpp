@@ -27,7 +27,7 @@ namespace fengin::systems::SFMLSystems
         int layer;
         sf::RenderWindow *window;
         components::Camera *camData;
-        std::vector<futils::IEntity *> objects;
+        std::vector<Entity *> objects;
     };
 
     struct AllLayersRendered

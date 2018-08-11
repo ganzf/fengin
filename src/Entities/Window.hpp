@@ -10,7 +10,7 @@
 
 namespace fengin::entities
 {
-    class Window : public futils::IEntity
+    class Window : public Entity
     {
     public:
         Window() {

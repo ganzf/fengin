@@ -8,7 +8,7 @@
 # include "utils/position.hpp"
 
 namespace fengin::components {
-    struct Transform : futils::IComponent {
+    struct Transform : Component {
         vec3f size;
         vec3f position;
         vec3f rotation;

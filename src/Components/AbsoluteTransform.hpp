@@ -8,7 +8,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct AbsoluteTransform : futils::IComponent {
+    struct AbsoluteTransform : Component {
         vec2i position;
         vec2i size;
     };

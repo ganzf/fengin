@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "utils/ecs.hpp"
+#include "fengin-core/include/ecs.hpp"
 
 namespace fengin::components {
-    struct ViewInfo : futils::IComponent {
+    struct ViewInfo : Component {
         // Ajouter valign, align, etc...
         float h;
         float w;

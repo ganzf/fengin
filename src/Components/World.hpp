@@ -7,7 +7,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct World : futils::IComponent {
+    struct World : Component {
         enum class Type {
             Normal = 0,
             Isometric

@@ -7,7 +7,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct Window : futils::IComponent {
+    struct Window : Component {
         std::string title;
         // TODO: futils::Asset
         // futils::Asset icon;

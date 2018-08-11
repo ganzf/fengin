@@ -8,7 +8,7 @@
 
 namespace fengin::components
 {
-    class Sprite : public futils::IComponent {
+    class Sprite : public Component {
     public:
         std::vector<futils::Image>    files;
         bool loop{true};

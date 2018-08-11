@@ -4,18 +4,21 @@
 
 #pragma once
 # include "fengin-core/include/events.hpp"
-# include "utils/ecs.hpp"
+# include "fengin-core/include/ecs.hpp"
 
-class Fysix : public futils::ISystem {
-    enum State
-    {
-        Init = 0,
-        Run
+namespace fengin {
+    class Fysix : public System {
+        enum State {
+            Init = 0,
+            Run
+        };
+        State state{Init};
+
+        void init();
+
+    public:
+        Fysix();
+
+        void run(float) final;
     };
-    State state{Init};
-    void init();
-public:
-    Fysix();
-
-    void run(float) final;
-};
+}

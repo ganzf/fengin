@@ -8,7 +8,7 @@
 # include "utils/inputKeys.hpp"
 
 namespace fengin::components {
-    struct Input : futils::IComponent {
+    struct Input : Component {
         bool activated{false};
         std::string name;
         std::unordered_map<futils::InputSequence, std::function<void()>> map;

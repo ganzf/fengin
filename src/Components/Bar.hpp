@@ -8,7 +8,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct Bar : futils::IComponent {
+    struct Bar : Component {
         
     };
 }

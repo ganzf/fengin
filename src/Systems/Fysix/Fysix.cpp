@@ -6,30 +6,31 @@
 #include "Collision.hpp"
 #include "RigidBody.hpp"
 
-extern "C" futils::ISystem *build()
+extern "C" fengin::System *build()
 {
-    return new Fysix();
+    return new fengin::Fysix();
 }
 
-Fysix::Fysix()
-{
-    name = "Fysix";
-}
+namespace fengin {
+    Fysix::Fysix() {
+        name = "Fysix";
+    }
 
-void Fysix::init() {
-    addReaction<fengin::events::Shutdown>([this](futils::IMediatorPacket &){
-        entityManager->removeSystem(name);
-    });
-    entityManager->addSystem<fengin::systems::FysicsSystems::RigidBody>();
-    entityManager->addSystem<fengin::systems::FysicsSystems::Collision>();
-    state = Run;
-}
+    void Fysix::init() {
+        addReaction<fengin::events::Shutdown>([this](futils::IMediatorPacket &) {
+            entityManager->removeSystem(name);
+        });
+        entityManager->addSystem<fengin::systems::FysicsSystems::RigidBody>();
+        entityManager->addSystem<fengin::systems::FysicsSystems::Collision>();
+        state = Run;
+    }
 
-void Fysix::run(float)
-{
-    switch (state)
-    {
-        case Init : return init();
-        case Run : return ;
+    void Fysix::run(float) {
+        switch (state) {
+            case Init :
+                return init();
+            case Run :
+                return;
+        }
     }
 }

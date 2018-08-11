@@ -15,7 +15,7 @@ namespace fengin::systems::SFMLSystems
     void AssetLoader::init() {
         __init();
         addReaction<RequestAssets>([this](futils::IMediatorPacket &pkg){
-            const auto &packet = futils::Mediator::rebuild<RequestAssets>(pkg);
+            const auto &packet = EventManager::rebuild<RequestAssets>(pkg);
             if (packet.absolutePaths)
                 events->send<std::string>("Assets requested with absolute paths...");
             else
@@ -29,7 +29,7 @@ namespace fengin::systems::SFMLSystems
         });
 
         addReaction<RequestTexture>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<RequestTexture>(pkg);
+            auto &packet = EventManager::rebuild<RequestTexture>(pkg);
             packet.call(&_textures[packet.path]);
         });
 

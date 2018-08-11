@@ -7,13 +7,13 @@
 // TODO: Change CMAKELISTS.TXT to make this compile :)
 # include <SFML/Graphics.hpp>
 
-# include "utils/ecs.hpp"
+# include "fengin-core/include/ecs.hpp"
 # include "fengin-core/include/events.hpp"
 # include "utils/rendering.hpp"
 # include "System.hpp"
 
 namespace fengin::systems {
-    class SFMLRenderer : public futils::ISystem {
+    class SFMLRenderer : public System {
         enum State
         {
             NONE = -1,

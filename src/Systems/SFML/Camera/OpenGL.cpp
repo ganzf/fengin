@@ -23,7 +23,7 @@ namespace fengin::systems::SFMLSystems {
         __init();
         events->send<RequestWindow>();
         addReaction<futils::Keys>([&_x, &_y, &_z](futils::IMediatorPacket &pkg){
-            auto &key = futils::Mediator::rebuild<futils::Keys>(pkg);
+            auto &key = EventManager::rebuild<futils::Keys>(pkg);
             if (key == futils::Keys::X) {
                 _x -= 1;
             }
@@ -46,7 +46,7 @@ namespace fengin::systems::SFMLSystems {
             glGetIntegerv( GL_VIEWPORT, viewport );
         });
         addReaction<ResponseWindow>([this](futils::IMediatorPacket &pkg){
-            auto &packet = futils::Mediator::rebuild<ResponseWindow>(pkg);
+            auto &packet = EventManager::rebuild<ResponseWindow>(pkg);
             if (!packet.window) {
                 std::cerr << "No window received" << std::endl;
                 return;
@@ -62,8 +62,16 @@ namespace fengin::systems::SFMLSystems {
             this->setupOpenGlVertices();
         });
         addReaction<AssetsLoaded>([this](futils::IMediatorPacket &pkg){
-            const auto &packet = futils::Mediator::rebuild<AssetsLoaded>(pkg);
+            const auto &packet = EventManager::rebuild<AssetsLoaded>(pkg);
             for (auto &texture: *packet.textures) {
+//
+//                glActiveTexture(texIndex[_index]);
+//                glBindTexture(_type, this->_id);
+//                _image = SOIL_load_image(_source.c_str(), &_width, &_height, 0, SOIL_LOAD_RGB);
+//                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, _image);
+//                SOIL_free_image_data(_image);
+//                glUniform1i(glGetUniformLocation(_shaderProg, _varName.c_str()), _index);
+
                 GLuint textureId = SOIL_load_OGL_texture(
                         std::string("./resources/" + texture.first).c_str(),
                                 SOIL_LOAD_AUTO,
@@ -78,13 +86,14 @@ namespace fengin::systems::SFMLSystems {
                 } else {
                     events->send<std::string>("Texture " + texture.first + " loaded into OpenGL with soil and id " + std::to_string(textureId));
                     this->loadedGlTextures[texture.first] = textureId;
+//                    Allocate 1 name for texture textureId
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 }
                 std::cout << "Received texture " << texture.first << " in openGL " << std::endl;
-//                this->loadedGlTextures[texture.first] = texture.second;
             }
-            glBindTexture(GL_TEXTURE0, loadedGlTextures["wood.png"]);
-            glBindTexture(GL_TEXTURE1, loadedGlTextures["gras.png"]);
-            glBindTexture(GL_TEXTURE2, loadedGlTextures["dirt1.png"]);
         });
         events->send<RequestWindow>();
         events->send<RequestAssets>();
@@ -97,8 +106,8 @@ namespace fengin::systems::SFMLSystems {
         glClearDepth(1.f);
         glClearColor(0.3f, 0.3f, 0.3f, 0.f);
         glEnable(GL_DEPTH_TEST);
-//        glDepthFunc(GL_LESS);
-        glDepthFunc(GL_LEQUAL);
+        glDepthFunc(GL_LESS);
+//        glDepthFunc(GL_LEQUAL);
         glDepthMask(GL_TRUE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //        glEnable(GL_BLEND);
@@ -122,21 +131,36 @@ namespace fengin::systems::SFMLSystems {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         glTranslatef(0, 0, -100);
-        glRotatef(30, 1, 0, 0);
-        glRotatef(rot.z - 45.0f, 0, 1, 0);
+//        If its a billboard or not depends what order you rotate and translate.
+        glRotatef(30.0f, 1, 0, 0);
+        glRotatef(-45.0f, 0, 1, 0);
         glTranslatef(-(pos.x - camPos.x) * zoom * 2, (pos.z - camPos.z) * zoom * 2, (pos.y - camPos.y) * zoom * 2);
+        if (box.getEntity().has<fengin::components::Billboard>()) {
+            glRotatef(-30.0f, 1, 0, 0);
+            glRotatef(45.0f, 0, 1, 0);
+        } else {
+            glRotatef(rot.x, 0, 0, 0);
+            glRotatef(rot.z, 0, 1, 0);
+            glRotatef(rot.y, 0, 0, 1);
+        }
 //        glLoadIdentity();
 ////        make a 0,0,0 cube appear at the center of the screen instead of around the camera
 //        glTranslatef(x, y, z);
 ////        This would be the size of the cube ! with a base of 10
         glScalef(zoom * size.x, zoom * size.z, zoom * size.y);
-
+//        glEnable(GL_TEXTURE_2D);
+//        glEnable(GL_BLEND);
+//        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//        glDepthMask(GL_FALSE);
+//        glDisable(GL_DEPTH_TEST);
+        glColor3f(1.0f, 1.0f, 1.0f);
         //Draw a cube
+        glBindTexture(GL_TEXTURE_2D, loadedGlTextures[box.textures[0]]);
         glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
 //        glBegin(GL_LINES);
 //        sf::Texture::bind((const sf::Texture *) &loadedGlTextures["grass.png"]);
-
         // Front Face
+//        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["dirt1.png"]);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);	// Bottom Left
         glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Right
         glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Top Right
@@ -146,12 +170,18 @@ namespace fengin::systems::SFMLSystems {
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Right
         glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Left
         glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["grass.png"]);
+        glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
         // Top Face
-//        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["dirt1.png"]);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);	// Bottom Left
         glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right
         glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
+        glEnd();
+        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["dirt2.png"]);
+        glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
 //        // Bottom Face
 //        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right
 //        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left
@@ -230,23 +260,28 @@ namespace fengin::systems::SFMLSystems {
 
         glEnd();
 
-        glBegin(GL_LINES);
-        const auto hoveringHeight = 0.05f;
-        const auto transparency = 0.25f;
+        if (!box.getEntity().has<fengin::components::Billboard>()) {
+            glBegin(GL_LINES);
+            const auto hoveringHeight = 0.05f;
+            const auto transparency = 0.25f;
 //        glColor4f(0.9, 0.9, 0.9, transparency); // whitish grid
-        // 1 - 2
-        glVertex3f( 1.f, 1.0f + hoveringHeight,  1.f);
-        glVertex3f( 1.f, 1.0f + hoveringHeight, -1.f);
-        // 2 - 3
-        glVertex3f(-1.f, 1.0f + hoveringHeight, -1.f);
-        glVertex3f( 1.f, 1.0f + hoveringHeight, -1.f);
-        // 3 - 4
-        glVertex3f(-1.f, 1.0f + hoveringHeight, -1.f);
-        glVertex3f(-1.f, 1.0f + hoveringHeight,  1.f);
-        // 4 - 1
-        glVertex3f(-1.f, 1.0f + hoveringHeight,  1.f);
-        glVertex3f( 1.f, 1.0f + hoveringHeight,  1.f);
-        glEnd();
+            // 1 - 2
+            glVertex3f(1.f, 1.0f + hoveringHeight, 1.f);
+            glVertex3f(1.f, 1.0f + hoveringHeight, -1.f);
+            // 2 - 3
+            glVertex3f(-1.f, 1.0f + hoveringHeight, -1.f);
+            glVertex3f(1.f, 1.0f + hoveringHeight, -1.f);
+            // 3 - 4
+            glVertex3f(-1.f, 1.0f + hoveringHeight, -1.f);
+            glVertex3f(-1.f, 1.0f + hoveringHeight, 1.f);
+            // 4 - 1
+            glVertex3f(-1.f, 1.0f + hoveringHeight, 1.f);
+            glVertex3f(1.f, 1.0f + hoveringHeight, 1.f);
+            glEnd();
+        }
+//        glEnable(GL_DEPTH_TEST);
+//        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
     }
 
     void OpenGL::render(float elapsed) {

@@ -8,7 +8,7 @@
 # include "fengin-core/include/FenginCore.hpp"
 
 namespace fengin::components {
-    struct Editable : futils::IComponent {
+    struct Editable : Component {
         bool hasFocus{false};
         std::function<void()> onFocus{[](){}};
         std::function<void()> onFocusLost{[](){}};
