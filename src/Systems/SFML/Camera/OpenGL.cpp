@@ -155,7 +155,7 @@ namespace fengin::systems::SFMLSystems {
 //        glDisable(GL_DEPTH_TEST);
         glColor3f(1.0f, 1.0f, 1.0f);
         //Draw a cube
-        glBindTexture(GL_TEXTURE_2D, loadedGlTextures[box.textures[0]]);
+        glBindTexture(GL_TEXTURE_2D, loadedGlTextures[box.textures[1]]);
         glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
 //        glBegin(GL_LINES);
 //        sf::Texture::bind((const sf::Texture *) &loadedGlTextures["grass.png"]);
@@ -172,7 +172,7 @@ namespace fengin::systems::SFMLSystems {
         glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Bottom Left
         glEnd();
 
-        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["grass.png"]);
+        glBindTexture(GL_TEXTURE_2D, loadedGlTextures[box.textures[0]]);
         glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
         // Top Face
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);	// Top Left
@@ -180,9 +180,10 @@ namespace fengin::systems::SFMLSystems {
         glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);	// Bottom Right
         glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);	// Top Right
         glEnd();
-        glBindTexture(GL_TEXTURE_2D, loadedGlTextures["dirt2.png"]);
+
+        // Bottom Face
+        glBindTexture(GL_TEXTURE_2D, loadedGlTextures[box.textures[2]]);
         glBegin(box.wireframe ? GL_LINES : GL_QUADS);//draw some squares
-//        // Bottom Face
 //        glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);	// Top Right
 //        glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);	// Top Left
 //        glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);	// Bottom Left
