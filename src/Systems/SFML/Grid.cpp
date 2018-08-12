@@ -33,7 +33,7 @@ namespace fengin::systems::SFMLSystems {
             vertical[1].position.x = x;
             vertical[0].color << color;
             vertical[1].color << color;
-            window.draw(vertical, 2, sf::Lines);
+//            window.draw(vertical, 2, sf::Lines);
             x += world->unit;
         }
         while (y < window.getSize().y)
@@ -42,7 +42,7 @@ namespace fengin::systems::SFMLSystems {
             horizontal[1].position.y = y;
             horizontal[1].color << color;
             horizontal[0].color << color;
-            window.draw(horizontal, 2, sf::Lines);
+//            window.draw(horizontal, 2, sf::Lines);
             y += world->unit;
         }
     }

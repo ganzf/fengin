@@ -60,8 +60,8 @@ namespace fengin::systems::SFMLSystems {
                     sf::Vertex(sf::Vector2f(window->getSize().x / 2 - crossHairSize, window->getSize().y / 2)),
                     sf::Vertex(sf::Vector2f(window->getSize().x / 2 + crossHairSize, window->getSize().y / 2))
             };
-            window->draw(vertical, 2, sf::Lines);
-            window->draw(horizontal, 2, sf::Lines);
+//            window->draw(vertical, 2, sf::Lines);
+//            window->draw(horizontal, 2, sf::Lines);
         }
     }
 

@@ -66,8 +66,8 @@ namespace fengin::systems::SFMLSystems {
                     sf::Vertex(sf::Vector2f(window->getSize().x / 2 - crossHairSize, window->getSize().y / 2)),
                     sf::Vertex(sf::Vector2f(window->getSize().x / 2 + crossHairSize, window->getSize().y / 2))
             };
-            window->draw(vertical, 2, sf::Lines);
-            window->draw(horizontal, 2, sf::Lines);
+//            window->draw(vertical, 2, sf::Lines);
+//            window->draw(horizontal, 2, sf::Lines);
         }
     }
 
@@ -174,7 +174,7 @@ namespace fengin::systems::SFMLSystems {
                     auto screen = worldToScreen(world);
                     point.setPosition(screen.x, screen.y);
                     point.setFillColor(c);
-                    realWindow->draw(point);
+//                    realWindow->draw(point);
                 };
 
                 auto drawLine = [this, realWindow, worldToScreen](fengin::vec3f p1, fengin::vec3f p2, sf::Color c){
@@ -184,7 +184,7 @@ namespace fengin::systems::SFMLSystems {
                             sf::Vertex(sf::Vector2f(a.x, a.y), c),
                             sf::Vertex(sf::Vector2f(b.x, b.y), c),
                     };
-                    realWindow->draw(line, 2, sf::Lines);
+//                    realWindow->draw(line, 2, sf::Lines);
                 };
                 const auto box = getBoundingBox(transform);
                 bool isVisible = true;
@@ -216,10 +216,10 @@ namespace fengin::systems::SFMLSystems {
                     RequestTexture request;
                     request.path = path;
                     request.call = [this, realWindow, face](sf::Texture *texture){
-                        if (texture)
-                            realWindow->draw(face, texture);
-                        else
-                            realWindow->draw(face);
+//                        if (texture)
+//                            realWindow->draw(face, texture);
+//                        else
+//                            realWindow->draw(face);
                     };
                     events->send<RequestTexture>(request);
                 };

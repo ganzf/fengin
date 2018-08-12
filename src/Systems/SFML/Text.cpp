@@ -60,7 +60,7 @@ namespace fengin::systems::SFMLSystems
         else if (txt.style.valign == futils::VAlign::Bottom)
             h_pos = absolute.position.y + absolute.size.h - text.getGlobalBounds().height / 2;
         text.setPosition(w_pos, h_pos);
-        window.draw(text);
+//        window.draw(text);
     }
 
     void Text::init() {

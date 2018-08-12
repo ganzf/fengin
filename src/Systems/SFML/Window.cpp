@@ -31,7 +31,7 @@ namespace fengin::systems::SFMLSystems
             sf::Color color;
             if (window->has<components::Color>()) {
                 color << window->get<components::Color>().color;
-                realWindow->clear(color);
+//                realWindow->clear(color);
             }
         });
         addReaction<RequestWindow>([this](futils::IMediatorPacket &pkg){
@@ -111,8 +111,13 @@ namespace fengin::systems::SFMLSystems
         {
             sf::ContextSettings settings;
             settings.depthBits = 24;
-
+            settings.stencilBits = 8;
+            settings.antialiasingLevel = 4;
+            settings.attributeFlags = sf::ContextSettings::Core;
+            settings.majorVersion = 4;
+            settings.minorVersion = 5;
             real.win = new sf::RenderWindow(sf::VideoMode(data.size.w, data.size.h, 32), data.title, styleToSfStyle[real.data->style], settings);
+            real.win->setActive();
             real.win->setFramerateLimit(60);
             if (real.win->isOpen()) {
                 data.isOpen = true;

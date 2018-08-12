@@ -5,12 +5,13 @@
 
 #pragma once
 
+# include "GL/glew.h"
 # include <Entities/Window.hpp>
 # include <SFML/Graphics/RenderWindow.hpp>
 # include <Components/Box.hpp>
 # include <Components/Billboard.hpp>
 # include <Systems/SFML/Utils/VBO.hpp>
-# include "GL/glew.h"
+# include <Systems/SFML/Utils/ShaderProgram.hpp>
 # include "../System.hpp"
 # include "../Utils/VAO.hpp"
 
@@ -30,6 +31,7 @@ namespace fengin::systems::SFMLSystems {
 
         utils::VAO vao;
         utils::VBO vbo;
+        utils::ShaderProgram shaderProgram;
 
         void renderTile(vec3f pos, vec3f size, vec3f rot, const components::Box &);
         void render(float elapsed);

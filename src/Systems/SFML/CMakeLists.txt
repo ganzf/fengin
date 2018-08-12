@@ -16,13 +16,10 @@ FILE (GLOB ISOSHAPES ./IsoShapes/*.hpp ./IsoShapes/*.cpp)
 FILE (GLOB UTILS ./Utils/*.hpp ./Utils/*.cpp)
 FILE (GLOB SOURCES ./*.cpp ./*.hpp ./Camera/*.cpp ./Camera/*.hpp ${ENTITIES} ${COMPONENTS} ${ISOSHAPES} ${UTILS})
 
-# Trying this to link static into shared library
-#SET(SFML -Wl,-all ${SOIL} -Wl,-notall)
-
 include_directories(${OPENGL_INCLUDE_DIR} ../../../libs/soil/src glm ${GLEW_INCLUDE_DIRS})
 file(GLOB SOIL_SOURCES ../../../libs/soil/src/*.c)
 add_library(SFML SHARED ${SOURCES} ${SOIL_SOURCES})
 
-target_link_libraries(SFML -lstdc++fs ${OPENGL_LIBRARIES} ${SOIL} ${GLEW_LIBRARIES})
+target_link_libraries(SFML -lstdc++fs ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${SOIL})
 set_target_properties(SFML PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(SFML PROPERTIES PUBLIC_HEADER SFML.hpp)

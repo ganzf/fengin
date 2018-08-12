@@ -27,7 +27,7 @@ namespace fengin::systems::SFMLSystems
             c << colorComponent.color;
             sprite.setFillColor(c);
         }
-        window.draw(sprite);
+//        window.draw(sprite);
     }
 
     void Image::init() {

@@ -18,7 +18,6 @@ float _z = 0.0f;
 namespace fengin::systems::SFMLSystems {
     void OpenGL::init() {
         __init();
-        events->send<RequestWindow>();
         addReaction<futils::Keys>([&_x, &_y, &_z](futils::IMediatorPacket &pkg){
             auto &key = EventManager::rebuild<futils::Keys>(pkg);
             if (key == futils::Keys::X) {
@@ -47,12 +46,22 @@ namespace fengin::systems::SFMLSystems {
                 return;
             }
             win = (packet.window);
+            glewExperimental = GL_TRUE;
+            if (glewInit() != GLEW_OK) {
+                events->send<events::Shutdown>();
+                std::cerr << "GlewInit Failed." << std::endl;
+            } else {
+                std::cout << "GlewInit ok" << std::endl;
+            }
             phase++;
             sf::ContextSettings settings = win->getSettings();
-            std::cout << "depth bits:" << settings.depthBits << std::endl;
-            std::cout << "stencil bits:" << settings.stencilBits << std::endl;
-            std::cout << "antialiasing level:" << settings.antialiasingLevel << std::endl;
-            std::cout << "version:" << settings.majorVersion << "." << settings.minorVersion << std::endl;
+            std::cout << "depth bits:\t" << settings.depthBits << std::endl;
+            std::cout << "stencil bits:\t" << settings.stencilBits << std::endl;
+            std::cout << "antialiasing level:\t" << settings.antialiasingLevel << std::endl;
+            std::cout << "version:\t" << settings.majorVersion << "." << settings.minorVersion << std::endl;
+            std::cout << "GL VERSION:\t" << glGetString(GL_VERSION) << std::endl;
+            std::cout << "GLSL VERSION:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+            std::cout << "GL EXTENSIONS:\t" << glGetString(GL_EXTENSIONS) << std::endl;
             this->setupOpenGlVertices();
         });
         addReaction<AssetsLoaded>([this](futils::IMediatorPacket &pkg){
@@ -87,6 +96,8 @@ namespace fengin::systems::SFMLSystems {
 
     void OpenGL::setupOpenGlVertices() {
         win->setVerticalSyncEnabled(true);
+        vao.gen();
+        vbo.gen();
         std::vector<GLfloat> triangle;
 //        -1.0f, -1.0f, 0.0f,
 //         1.0f, -1.0f, 0.0f,
@@ -104,6 +115,12 @@ namespace fengin::systems::SFMLSystems {
         triangle.push_back(0.0f);
 
         vbo.set(triangle);
+        shaderProgram.loadShadersFromDir("./Shaders/vertexShaders/", utils::Shader::ShaderType::Vertex);
+        shaderProgram.loadShadersFromDir("./Shaders/fragmentShaders/", utils::Shader::ShaderType::Fragment);
+        if (shaderProgram.compile()) {
+            events->send<std::string>("Compiled shaders successfully");
+        }
+        shaderProgram.use();
     }
 
     void OpenGL::renderTile(vec3f pos, vec3f size, vec3f rot, const components::Box &box) {
@@ -113,25 +130,25 @@ namespace fengin::systems::SFMLSystems {
     }
 
     void OpenGL::render(float elapsed) {
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         vbo.draw();
-        static auto timer = 0.0f;
-        timer += elapsed;
-        if (!this->win || !this->cam) {
-            auto cams = entityManager->get<components::Camera>();
-            if (cams.size() > 0) {
-                cam = dynamic_cast<Camera *>(&cams[0]->getEntity());
-            }
-            return;
-        }
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        auto go = entityManager->get<fengin::components::GameObject>();
-        for (auto &obj: go) {
-            if (!obj->visible)
-                continue;
-            auto &tr = obj->getEntity().get<components::Transform>();
-            if (obj->getEntity().has<components::Box>())
-                renderTile(tr.position, tr.size, tr.rotation, obj->getEntity().get<components::Box>());
-        }
+//        static auto timer = 0.0f;
+//        timer += elapsed;
+//        if (!this->win || !this->cam) {
+//            auto cams = entityManager->get<components::Camera>();
+//            if (cams.size() > 0) {
+//                cam = dynamic_cast<Camera *>(&cams[0]->getEntity());
+//            }
+//            return;
+//        }
+//        auto go = entityManager->get<fengin::components::GameObject>();
+//        for (auto &obj: go) {
+//            if (!obj->visible)
+//                continue;
+//            auto &tr = obj->getEntity().get<components::Transform>();
+//            if (obj->getEntity().has<components::Box>())
+//                renderTile(tr.position, tr.size, tr.rotation, obj->getEntity().get<components::Box>());
+//        }
         win->display();
     }
 }

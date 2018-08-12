@@ -8,9 +8,10 @@
 
 namespace fengin::systems::SFMLSystems::utils {
     class VAO {
-        GLuint id;
+        GLuint id{0};
     public:
-        explicit VAO() {
+        VAO() = default;
+        void gen() {
             glGenVertexArrays(1, &id);
             glBindVertexArray(id);
         }

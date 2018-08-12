@@ -12,7 +12,9 @@ namespace fengin::systems::SFMLSystems::utils {
     class VBO {
         GLuint id;
     public:
-        VBO() {
+        VBO() = default;
+
+        void gen() {
             glGenBuffers(1, &id);
         }
 

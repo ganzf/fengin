@@ -20,29 +20,29 @@ namespace fengin::systems::SFMLSystems
             shape.setOutlineColor(color);
             shape.setSize(sf::Vector2f(absolute.size.w, absolute.size.h));
             shape.setPosition(absolute.position.x, absolute.position.y);
-            window.draw(shape);
+//            window.draw(shape);
         } else {
             sf::RectangleShape line;
             line.setFillColor(color);
             if (border.up) {
                 line.setPosition(absolute.position.x, absolute.position.y - border.thickness);
                 line.setSize(sf::Vector2f(absolute.size.w, border.thickness));
-                window.draw(line);
+//                window.draw(line);
             }
             if (border.down) {
                 line.setPosition(absolute.position.x, absolute.position.y + absolute.size.h);
                 line.setSize(sf::Vector2f(absolute.size.w, border.thickness));
-                window.draw(line);
+//                window.draw(line);
             }
             if (border.left) {
                 line.setPosition(absolute.position.x - border.thickness, absolute.position.y);
                 line.setSize(sf::Vector2f(border.thickness, absolute.size.h));
-                window.draw(line);
+//                window.draw(line);
             }
             if (border.right) {
                 line.setPosition(absolute.position.x + absolute.size.w, absolute.position.y);
                 line.setSize(sf::Vector2f(border.thickness, absolute.size.h));
-                window.draw(line);
+//                window.draw(line);
             }
         }
     }
