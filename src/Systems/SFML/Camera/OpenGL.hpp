@@ -9,8 +9,10 @@
 # include <SFML/Graphics/RenderWindow.hpp>
 # include <Components/Box.hpp>
 # include <Components/Billboard.hpp>
-# include "SFML/OpenGL.hpp"
+# include <Systems/SFML/Utils/VBO.hpp>
+# include "GL/glew.h"
 # include "../System.hpp"
+# include "../Utils/VAO.hpp"
 
 namespace fengin::systems::SFMLSystems {
     class OpenGL : public System {
@@ -26,6 +28,8 @@ namespace fengin::systems::SFMLSystems {
         void init();
         void setupOpenGlVertices();
 
+        utils::VAO vao;
+        utils::VBO vbo;
 
         void renderTile(vec3f pos, vec3f size, vec3f rot, const components::Box &);
         void render(float elapsed);
