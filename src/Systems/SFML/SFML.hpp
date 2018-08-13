@@ -4,9 +4,6 @@
 
 #pragma once
 
-// TODO: Change CMAKELISTS.TXT to make this compile :)
-# include <SFML/Graphics.hpp>
-
 # include "fengin-core/include/ecs.hpp"
 # include "fengin-core/include/events.hpp"
 # include "utils/rendering.hpp"

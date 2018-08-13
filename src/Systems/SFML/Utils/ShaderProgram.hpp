@@ -25,12 +25,17 @@ namespace fengin::systems::SFMLSystems::utils {
                 if (!std::experimental::filesystem::is_directory(p.path())) {
                     auto *shader = new Shader(p.path(), type);
                     loadedShaders.push_back(shader);
+                    if (type == Shader::ShaderType::Vertex) {
+                        std::cout << "Loaded Vertex shader " << p.path() << std::endl;
+                    } else if (type == Shader::ShaderType::Fragment) {
+                        std::cout << "Loaded Fragment shader " << p.path() << std::endl;
+                    }
                 }
             }
         }
 
         bool compile() {
-            printf("Linking program\n");
+            std::cout << "Linking program" << std::endl;
             id = glCreateProgram();
             // Attach each shader
             for (auto &shader: loadedShaders) {
@@ -56,12 +61,20 @@ namespace fengin::systems::SFMLSystems::utils {
             for (auto &shader: loadedShaders) {
                 shader->free();
             }
-            return true;
+            return linkResult == GL_TRUE;
         }
 
         void use() {
+            std::cout << "Using program " << id << std::endl;
             glUseProgram(id);
-            glGetError();
+            auto e = glGetError();
+            if (e != GL_NO_ERROR) {
+                std::cerr << gluGetString(e) << std::endl;
+            }
+        }
+
+        GLuint getId() const {
+            return id;
         }
     };
 }

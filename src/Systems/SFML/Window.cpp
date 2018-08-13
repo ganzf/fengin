@@ -28,11 +28,11 @@ namespace fengin::systems::SFMLSystems
             auto window = cam.window;
             auto &winCompo = window->get<components::Window>();
             auto realWindow = _windows.at(&winCompo).win;
-            sf::Color color;
-            if (window->has<components::Color>()) {
-                color << window->get<components::Color>().color;
+//            sf::Color color;
+//            if (window->has<components::Color>()) {
+//                color << window->get<components::Color>().color;
 //                realWindow->clear(color);
-            }
+//            }
         });
         addReaction<RequestWindow>([this](futils::IMediatorPacket &pkg){
             auto &request = EventManager::rebuild<RequestWindow>(pkg);
@@ -116,7 +116,7 @@ namespace fengin::systems::SFMLSystems
             settings.attributeFlags = sf::ContextSettings::Core;
             settings.majorVersion = 4;
             settings.minorVersion = 5;
-            real.win = new sf::RenderWindow(sf::VideoMode(data.size.w, data.size.h, 32), data.title, styleToSfStyle[real.data->style], settings);
+            real.win = new sf::Window(sf::VideoMode(data.size.w, data.size.h, 32), data.title, styleToSfStyle[real.data->style], settings);
             real.win->setActive();
             real.win->setFramerateLimit(60);
             if (real.win->isOpen()) {

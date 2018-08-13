@@ -2,13 +2,10 @@
 // Created by arroganz on 1/3/18.
 //
 
-#include <SFML/Graphics.hpp>
 #include <Entities/Camera.hpp>
 #include "utils/inputKeys.hpp"
 #include "Camera.hpp"
 #include "../Window.hpp"
-#include "NormalCam.hpp"
-#include "IsoCam.hpp"
 #include "OpenGL.hpp"
 
 using WorldAttached = fengin::ComponentAttached<fengin::components::World>;
@@ -21,19 +18,11 @@ namespace fengin::systems::SFMLSystems
             __init();
             addReaction<WorldAttached>([this](futils::IMediatorPacket &pkg){
                 auto &world = EventManager::rebuild<WorldAttached>(pkg);
-                if (world.compo.type == fengin::components::World::Type::Normal) {
-                    entityManager->addSystem<fengin::systems::SFMLSystems::NormalCam>();
-                } else if (world.compo.type == fengin::components::World::Type::Isometric) {
-                    entityManager->addSystem<fengin::systems::SFMLSystems::OpenGL>();
-                }
+                entityManager->addSystem<fengin::systems::SFMLSystems::OpenGL>();
             });
             addReaction<WorldDetached>([this](futils::IMediatorPacket &pkg){
                 auto &world = EventManager::rebuild<WorldDetached >(pkg);
-                if (world.compo.type == fengin::components::World::Type::Normal) {
-                    entityManager->removeSystem("NormalCam");
-                } else if (world.compo.type == fengin::components::World::Type::Isometric) {
-                    entityManager->removeSystem("OpenGL");
-                }
+                entityManager->removeSystem("OpenGL");
             });
         };
     }

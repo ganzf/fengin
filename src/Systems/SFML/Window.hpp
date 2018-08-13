@@ -6,7 +6,6 @@
 #define FENGIN_WINDOW_HPP
 
 # include <SFML/Window.hpp>
-# include <SFML/Graphics.hpp>
 # include "System.hpp"
 # include "Entities/Window.hpp"
 # include "Components/Color.hpp"
@@ -21,7 +20,7 @@ namespace fengin::systems::SFMLSystems
     struct ResponseWindow
     {
         Entity *camera;
-        sf::RenderWindow *window;
+        sf::Window *window;
     };
 
     struct ClearWindow
@@ -35,7 +34,7 @@ namespace fengin::systems::SFMLSystems
 
         struct RealWindow
         {
-            sf::RenderWindow *win{nullptr};
+            sf::Window *win{nullptr};
             Component *data{nullptr};
             Component copy;
         };

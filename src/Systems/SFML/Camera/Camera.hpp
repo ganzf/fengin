@@ -5,7 +5,6 @@
 #pragma once
 
 # include <SFML/Window.hpp>
-# include <SFML/Graphics.hpp>
 # include "../System.hpp"
 # include "Entities/Window.hpp"
 # include "Entities/GameObject.hpp"
@@ -25,24 +24,24 @@ namespace fengin::systems::SFMLSystems
     struct RenderLayer
     {
         int layer;
-        sf::RenderWindow *window;
+        sf::Window *window;
         components::Camera *camData;
         std::vector<Entity *> objects;
     };
 
     struct AllLayersRendered
     {
-        sf::RenderWindow *window;
+        sf::Window *window;
         components::Camera *camData;
     };
 }
 
-inline sf::Color &operator << (sf::Color &lhs, futils::Color const &rhs)
-{
-    //TODO: Big endian//litte endian ??
-    lhs.r = rhs.rgba[2];
-    lhs.g = rhs.rgba[1];
-    lhs.b = rhs.rgba[0];
-    lhs.a = rhs.rgba[3];
-    return lhs;
-}
+//inline sf::Color &operator << (sf::Color &lhs, futils::Color const &rhs)
+//{
+//    //TODO: Big endian//litte endian ??
+//    lhs.r = rhs.rgba[2];
+//    lhs.g = rhs.rgba[1];
+//    lhs.b = rhs.rgba[0];
+//    lhs.a = rhs.rgba[3];
+//    return lhs;
+//}

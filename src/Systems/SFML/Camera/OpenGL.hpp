@@ -7,7 +7,7 @@
 
 # include "GL/glew.h"
 # include <Entities/Window.hpp>
-# include <SFML/Graphics/RenderWindow.hpp>
+# include <SFML/Window.hpp>
 # include <Components/Box.hpp>
 # include <Components/Billboard.hpp>
 # include <Systems/SFML/Utils/VBO.hpp>
@@ -17,7 +17,7 @@
 
 namespace fengin::systems::SFMLSystems {
     class OpenGL : public System {
-        using Window = sf::RenderWindow;
+        using Window = sf::Window;
         using Camera = entities::Camera;
         Window *win{nullptr};
         Camera *cam{nullptr};
@@ -27,6 +27,7 @@ namespace fengin::systems::SFMLSystems {
 //        std::unordered_map<std::string, sf::Texture> loadedGlTextures;
 
         void init();
+        void loadAndCompileShaders();
         void setupOpenGlVertices();
 
         utils::VAO vao;
